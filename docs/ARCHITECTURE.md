@@ -1,59 +1,41 @@
 # CERVEL Public Architecture
 
-CERVEL is designed as a persistent semantic layer that remains independent from any single reasoning model, agent, application, or device.
+CERVEL is designed around a simple separation: **knowledge should persist even as the intelligence using it changes.**
 
-This document describes the public architectural model. It intentionally does not specify proprietary production algorithms or internal enforcement implementations.
+This document intentionally describes only the public conceptual model. It is not a specification of production algorithms, security mechanisms, deployment topology, storage design, or internal implementation.
 
-## Layer model
+## Conceptual model
 
 ```text
-World / Reality
-      ↓
-Embodiments
-Browser · Desktop · Mobile · Agents · APIs · Machines
-      ↓
-Interactions
-Capture · Search · Ask · Observe · Act
-      ↓
-Intelligence
-Replaceable models and agents operating through governed interfaces
-      ↓
-Persistent Semantic Layer
-Knowledge objects · Claims · Relationships · Events · State · Memory
-Provenance · Permissions · Identity
-      ↓
-Storage / Transport
-Local persistence · Encrypted synchronization · Organization-controlled nodes
+Sources and experiences
+        ↓
+Persistent knowledge
+        ↓
+Authorized interfaces
+        ↓
+Humans · applications · AI systems · machines
 ```
 
-The central architectural separation is between **persistent knowledge** and **replaceable intelligence**.
+The public architectural idea is that durable knowledge can be represented independently of any single model, application, or device and made available through explicitly defined interfaces.
 
 ## Persistent knowledge
 
-Information admitted into CERVEL can become a durable semantic object rather than remaining only a transient prompt or model conversation. Public specifications will progressively define interoperable representations for these objects and their evidence.
+CERVEL treats durable knowledge as something that can retain identity and source context beyond an individual prompt, conversation, or application session.
 
-## Embodiments
+Future public specifications may define interoperability contracts for selected knowledge representations. Only contracts explicitly published in this repository should be treated as public CERVEL interfaces.
 
-An embodiment is an interface through which a human, agent, application, or machine interacts with the same underlying knowledge world.
+## Interfaces
 
-A browser capture, desktop retrieval, mobile memory view, and agent context request should not require four unrelated copies of the same knowledge. The intended invariant is continuity of canonical knowledge identity across authorized embodiments.
+Different software and device experiences can interact with persistent knowledge through public contracts. The existence of a public interface does not disclose or prescribe the production implementation behind it.
 
-## Provenance
+## Provenance and access
 
-Knowledge should carry evidence about its origin and transformation. Outputs that depend on knowledge should be capable of referring back to supporting evidence through traceable interfaces.
+Public CERVEL interfaces are intended to support source-aware and access-aware interactions. Detailed production enforcement, authorization, ranking, synchronization, cryptography, storage, and reasoning mechanisms are outside the scope of this repository unless explicitly released.
 
-## Permissions
+## Model independence
 
-Access is not implied by possession of a model or connection to an agent. Implementations must evaluate the requesting identity and applicable knowledge scope before activation or disclosure.
+Persistent knowledge is not intended to belong permanently to one model provider. Compatible intelligence systems can change while the knowledge layer remains durable.
 
-## Model neutrality
+## Disclosure boundary
 
-CERVEL does not require persistent knowledge to belong to one model provider. Models are consumers and processors of scoped context; they are not the authoritative long-term container for the knowledge itself.
-
-## Trust boundary
-
-External captured content is treated as untrusted data. Capturing a webpage, document, message, or shared item must not convert instructions embedded in that content into trusted system commands.
-
-## Public vs. production implementation
-
-This repository can define contracts, schemas, expected behavior, compatibility rules, examples, and reference integrations. It should not be interpreted as a publication of every algorithm, enforcement mechanism, infrastructure component, optimization, enterprise feature, or research direction used by production CERVEL systems.
+This repository may publish selected concepts, contracts, schemas, compatibility rules, examples, and developer tools after disclosure review. Nothing in this overview should be interpreted as publication of non-public CERVEL implementation details or future research.
