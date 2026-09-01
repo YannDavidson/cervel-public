@@ -1,0 +1,11 @@
+{
+  "version": "0.1-draft",
+  "items": [
+    {
+      "reference": {
+        "version": "0.1-draft",
+        "id": "example:knowledge:fixture-1"
+      }
+    }
+  ]
+}
