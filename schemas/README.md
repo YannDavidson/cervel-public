@@ -1,14 +1,7 @@
 # CERVEL Public Schemas
 
-Versioned public schemas will live here after disclosure review.
+This directory is reserved for versioned schemas that have completed disclosure review.
 
-Schemas should expose only fields required for interoperability. Internal database representations, private authorization state, cryptographic material, operational metadata, and proprietary implementation details must not be exported merely because a related public concept exists.
+Published schemas should expose only information required by the public contract they implement. Non-public representations, security material, operational metadata, confidential information, and proprietary implementation details must not be included merely because a related concept is public.
 
-Every published schema should document:
-
-- schema/version identifier;
-- required and optional fields;
-- validation rules;
-- compatibility expectations;
-- privacy/security considerations;
-- whether unknown fields must be preserved, ignored, or rejected.
+Each schema should document its version, validation rules, compatibility expectations, and privacy/security considerations.
