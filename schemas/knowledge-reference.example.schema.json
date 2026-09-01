@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cervel.ai/public/schemas/knowledge-reference.example.schema.json",
+  "title": "CERVEL Knowledge Reference — Experimental Draft",
+  "description": "Illustrative public schema for the experimental knowledge reference draft. This is not a production CERVEL object schema.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "id"],
+  "properties": {
+    "version": {
+      "const": "0.1-draft"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Opaque interoperability identifier. Consumers must not infer internal semantics from its syntax."
+    },
+    "kind": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional minimal source context; not an authority or access claim."
+    }
+  }
+}
