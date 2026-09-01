@@ -18,8 +18,8 @@
         "required": ["reference"],
         "properties": {
           "reference": {
-            "type": "object",
-            "description": "Knowledge Reference validated against the applicable public Knowledge Reference contract."
+            "$ref": "https://cervel.ai/public/schemas/knowledge-reference.example.schema.json",
+            "description": "Knowledge Reference governed by the applicable public Knowledge Reference contract."
           },
           "text": {
             "type": "string"
