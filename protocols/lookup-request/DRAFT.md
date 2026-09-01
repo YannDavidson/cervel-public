@@ -52,6 +52,8 @@ A conforming consumer MUST reject a request when `version` or `query` is absent 
 
 If present, `limit` MUST be an integer greater than or equal to zero.
 
+If present, `scope` MUST be a non-empty string.
+
 A consumer MAY reject unsupported versions, empty queries, unsupported scope values, or limits outside constraints defined by its own public interface.
 
 Unknown optional fields SHOULD be ignored unless a later specification states otherwise.
