@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cervel.ai/public/schemas/lookup-request.example.schema.json",
+  "title": "CERVEL Lookup Request — Experimental Draft",
+  "description": "Illustrative public schema for the experimental lookup request. This is not a production CERVEL search or retrieval API schema.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "query"],
+  "properties": {
+    "version": {
+      "const": "0.1-draft"
+    },
+    "query": {
+      "type": "string"
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional opaque caller-provided scope hint."
+    }
+  }
+}
