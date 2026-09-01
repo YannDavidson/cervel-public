@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cervel.ai/public/schemas/lookup-result.example.schema.json",
+  "title": "CERVEL Lookup Result — Experimental Draft",
+  "description": "Illustrative public schema for the experimental lookup result. This is not a production CERVEL retrieval response schema.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "items"],
+  "properties": {
+    "version": {
+      "const": "0.1-draft"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["reference"],
+        "properties": {
+          "reference": {
+            "$ref": "https://cervel.ai/public/schemas/knowledge-reference.example.schema.json",
+            "description": "Knowledge Reference governed by the applicable public Knowledge Reference contract."
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
