@@ -50,6 +50,10 @@ Unknown fields SHOULD be ignored unless a later specification states otherwise.
 
 Error responses can accidentally reveal sensitive implementation details. Producers SHOULD minimize `message` content and other optional metadata to what is necessary at the public interface boundary.
 
+Public error codes SHOULD avoid exposing distinctions about authentication state, authorization state, resource existence, internal components, or private failure causes unless that distinction is intentionally documented as part of the public interface.
+
+Producers SHOULD prefer the least-specific public error representation that still allows the caller to respond appropriately.
+
 Producers MUST NOT intentionally include credentials, secrets, private configuration, authentication material, stack traces, private filesystem paths, internal service addresses, or unrelated personal or operational metadata.
 
 An error envelope MUST NOT itself grant authority, permission, access, or permission to retry an operation.
