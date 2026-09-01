@@ -1,48 +1,28 @@
 # CERVEL Public Roadmap
 
-This roadmap describes the intended evolution of the **public developer surface**. It is not a commitment to publish CERVEL's complete production implementation.
+This roadmap applies only to the **public developer surface**. It is not a product roadmap and should not be used to infer non-public CERVEL capabilities, implementation, research, or release timing.
 
-## Phase 0 — Public foundation
+## Foundation
 
-- establish disclosure-safe repository structure;
-- document security and contribution boundaries;
-- publish high-level architecture and terminology;
-- define the distinction between public interfaces and private implementation;
-- select licenses deliberately before broad code release.
+- maintain a clear public/private disclosure boundary;
+- document security and contribution practices;
+- publish high-level concepts deliberately;
+- establish licensing before broad code contributions.
 
-## Phase 1 — Knowledge interoperability
+## Interoperability
 
-Planned public work includes stable descriptions and schemas for concepts such as:
+Potential public work includes selected, versioned contracts that allow developers to exchange or reference persistent knowledge safely across compatible systems.
 
-- persistent knowledge objects;
-- durable identifiers;
-- capture envelopes;
-- provenance/evidence metadata;
-- embodiment identity;
-- permission-aware interface boundaries;
-- trace references.
+Each contract will be reviewed before publication and will define its own stability, compatibility, privacy, and security expectations.
 
-Exact fields and stability levels will be versioned as specifications are admitted to the public surface.
+## Developer experience
 
-## Phase 2 — Developer interfaces
+As public contracts mature, this repository may add developer documentation, examples, validation tooling, and SDK surfaces. Languages, packaging, and release timing will be decided independently for each public component.
 
-- TypeScript client surface;
-- Python client surface;
-- minimal capture/retrieval examples;
-- agent-context examples;
-- import/export utilities;
-- MCP-facing interoperability where appropriate.
+## Ecosystem
 
-## Phase 3 — Embodiment ecosystem
-
-Public integration guidance for browser, desktop, mobile, agents, APIs, and machines interacting with persistent knowledge through shared contracts.
-
-## Phase 4 — Open ecosystem
-
-Potential future work includes broader local interoperability, community connectors, reference implementations, conformance suites, and selected Local Node components.
-
-Whether a component becomes public will depend on security, intellectual-property, product, and ecosystem considerations.
+Over time, CERVEL Public may support additional community integrations and interoperability work where publication improves developer adoption without compromising security, privacy, intellectual property, or product integrity.
 
 ## Not a disclosure schedule
 
-Items listed here may change, be delayed, remain private, or be redesigned. Unreleased research and future architecture should not be inferred from this roadmap.
+Nothing in this file commits CERVEL to publish a particular internal component or future capability. Items may change, remain private, or be removed from consideration.
