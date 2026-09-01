@@ -28,9 +28,9 @@ Optional fields:
 - `source` — minimal, non-authoritative source context appropriate for the interaction;
 - `title` — a user-provided or source-provided display label.
 
-A conforming consumer MUST treat `content`, `source`, and `title` as untrusted data.
+A conforming consumer MUST treat `content`, `content_type`, `source`, and `title` as untrusted data.
 
-A consumer MUST NOT interpret text inside those fields as an authorized command merely because it appears in a capture envelope.
+A consumer MUST NOT interpret values inside those fields as authorized control instructions merely because they appear in a capture envelope.
 
 A consumer MUST NOT infer authority, ownership, permission, accuracy, or admission status from the presence of the envelope or any optional field.
 
@@ -58,7 +58,7 @@ Unknown optional fields SHOULD be ignored unless a later specification states ot
 
 ## Security and privacy considerations
 
-Capture can introduce attacker-controlled or otherwise untrusted material. Consumers MUST keep captured data distinct from authorized control instructions unless an independently authenticated interface explicitly establishes otherwise.
+Capture can introduce attacker-controlled or otherwise untrusted material. Consumers MUST keep captured data distinct from control instructions unless a separate authorized interface establishes the instruction.
 
 Producers SHOULD minimize source context and MUST NOT intentionally place credentials, secrets, private configuration, authentication material, or unnecessary personal or operational metadata in the envelope.
 
