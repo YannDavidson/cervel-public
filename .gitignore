@@ -21,11 +21,8 @@ __pycache__/
 .idea/
 .vscode/
 
-# Local CERVEL state
+# Local/private state
 .cervel/
-vault/
-runtime/
-reports/
 *.db
 *.sqlite
 *.sqlite3
