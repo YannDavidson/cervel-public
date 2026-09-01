@@ -4,47 +4,37 @@
 
 > Intelligence changes. Knowledge persists.
 
-This repository is the public home for CERVEL's developer-facing specifications, protocols, schemas, examples, and interoperability work.
+This repository is the deliberately reviewed public home for CERVEL developer-facing material.
 
-CERVEL is designed around a simple architectural belief: durable knowledge should not be trapped inside a particular model, agent, application, or document store. Knowledge should persist independently, retain provenance and permissions, and remain usable as intelligence changes.
+CERVEL is built around a simple idea: durable knowledge should remain useful even as models, applications, and interfaces change.
 
 ## Repository status
 
-CERVEL is currently in active alpha development. This public repository is being established deliberately. Public interfaces and specifications may evolve before a stable release.
+CERVEL is in active development. Public material may evolve before stable releases.
 
-The production CERVEL implementation is maintained separately. This repository does **not** contain the complete production runtime, proprietary reasoning implementation, enterprise control plane, private infrastructure, credentials, or unreleased research.
+This repository is **not** a mirror of non-public CERVEL source or infrastructure. Only material explicitly published here should be treated as part of the public CERVEL surface.
 
-## Public architecture
-
-The public CERVEL surface is organized around interoperable contracts rather than a specific reasoning model:
-
-- **Knowledge objects** — durable semantic objects that can be referenced independently of applications and models.
-- **Capture** — normalized ingestion boundaries for information entering CERVEL.
-- **Embodiments** — browser, desktop, mobile, agent, API, and machine interfaces to the same persistent knowledge world.
-- **Provenance** — evidence describing where knowledge came from and how it moved through the system.
-- **Permissions** — explicit boundaries governing what knowledge an identity may activate or access.
-- **Trace** — developer-facing evidence connecting outputs back to supporting knowledge.
-- **Model neutrality** — intelligence can change without requiring the underlying knowledge to disappear with it.
-
-## What will live here
+## Public repository
 
 ```text
-docs/        Public architecture and concepts
-protocols/   Interoperability contracts
-schemas/     Public data schemas
-sdk/         Developer-facing SDKs and clients
-examples/    Minimal integration examples
+docs/        Public concepts and documentation
+protocols/   Approved interoperability contracts
+schemas/     Approved public schemas
+sdk/         Developer tooling for published interfaces
+examples/    Public-safe examples
 ```
 
-The initial public foundation is being developed through pull requests so that disclosure boundaries can be reviewed before additional material reaches `main`.
+Every new public contract or implementation should pass disclosure, security, privacy, and intellectual-property review before publication.
+
+See `docs/PUBLIC_PRIVATE_BOUNDARY.md` for the publication policy.
 
 ## License
 
-No open-source license has been granted yet. Until a license is explicitly added, all rights are reserved. The eventual licensing model for specifications, SDKs, and executable components is under review and may differ by component.
+No open-source license has been granted yet. Until a license is explicitly added, all rights are reserved. Licensing may differ by component.
 
 ## Security
 
-Please do not publish suspected vulnerabilities, credentials, private endpoints, or sensitive implementation details in public issues. A coordinated disclosure policy is being added in `SECURITY.md`.
+Please do not publish suspected vulnerabilities or sensitive information in public issues. Follow `SECURITY.md` for coordinated disclosure.
 
 ## CERVEL
 

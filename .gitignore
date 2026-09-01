@@ -1,0 +1,31 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies / build
+node_modules/
+dist/
+build/
+coverage/
+.venv/
+__pycache__/
+*.pyc
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Local/private state
+.cervel/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
