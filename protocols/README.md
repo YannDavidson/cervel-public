@@ -1,7 +1,7 @@
 # CERVEL Public Protocols
 
-This directory is reserved for versioned interoperability contracts between CERVEL embodiments, developer clients, and compatible systems.
+This directory is reserved for versioned interoperability contracts that have completed disclosure review.
 
-Protocol publication is deliberate. A protocol appearing here defines a public contract; it does not imply that the production implementation behind that contract is open source.
+A protocol appearing here defines only the public contract stated in that protocol. It does not imply that any related production implementation, internal mechanism, or unreleased capability is public.
 
-Initial candidate areas include capture, embodiment identity, knowledge references, provenance, retrieval, and trace interoperability. Each protocol should define its stability level, versioning policy, security considerations, and compatibility expectations before being treated as stable.
+Each published protocol should define its status, versioning policy, compatibility expectations, and relevant security/privacy considerations.
