@@ -10,8 +10,9 @@ This index describes only the deliberately published interoperability drafts in 
 | Capture Envelope | `0.1-draft` | Experimental | Standalone public input envelope |
 | Lookup Request | `0.1-draft` | Experimental | Standalone public lookup expression |
 | Lookup Result | `0.1-draft` | Experimental | Contains Knowledge References |
+| Error Envelope | `0.1-draft` | Experimental | Generic public failure envelope |
 
-All four contracts are experimental and may change incompatibly before any stable specification is published.
+All indexed contracts are experimental and may change incompatibly before any stable specification is published.
 
 ## Composition model
 
@@ -26,6 +27,8 @@ Lookup Result
       ↓
 Knowledge Reference
 ```
+
+An Error Envelope may be used by a compatible public interface to report an unsuccessful interaction. Its presence in the index does not define which operations can fail or how failures are produced internally.
 
 The arrows express a possible public interoperability flow, not a required CERVEL production pipeline.
 

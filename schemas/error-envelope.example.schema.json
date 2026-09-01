@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cervel.ai/public/schemas/error-envelope.example.schema.json",
+  "title": "CERVEL Error Envelope — Experimental Draft",
+  "description": "Illustrative public schema for the experimental error envelope. This is not a production CERVEL error or exception schema.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "code"],
+  "properties": {
+    "version": {
+      "const": "0.1-draft"
+    },
+    "code": {
+      "type": "string",
+      "minLength": 1
+    },
+    "message": {
+      "type": "string"
+    }
+  }
+}
