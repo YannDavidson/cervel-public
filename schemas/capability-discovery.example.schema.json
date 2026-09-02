@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cervel.ai/public/schemas/capability-discovery.example.schema.json",
+  "title": "CERVEL Capability Discovery — Experimental Draft",
+  "description": "Illustrative public schema for the experimental capability discovery document. This is not a production CERVEL service-discovery or control-plane schema.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "contracts"],
+  "properties": {
+    "version": {
+      "const": "0.1-draft"
+    },
+    "contracts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["name", "version"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

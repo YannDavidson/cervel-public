@@ -11,6 +11,7 @@ This index describes only the deliberately published interoperability drafts in 
 | Lookup Request | `0.1-draft` | Experimental | Standalone public lookup expression |
 | Lookup Result | `0.1-draft` | Experimental | Contains Knowledge References |
 | Error Envelope | `0.1-draft` | Experimental | Generic public failure envelope |
+| Capability Discovery | `0.1-draft` | Experimental | Declares public contract/version pairs |
 
 All indexed contracts are experimental and may change incompatibly before any stable specification is published.
 
@@ -29,6 +30,8 @@ Knowledge Reference
 ```
 
 An Error Envelope may be used by a compatible public interface to report an unsuccessful interaction. Its presence in the index does not define which operations can fail or how failures are produced internally.
+
+Capability Discovery may declare which indexed public contract/version pairs an implementation intentionally exposes at a public interface. A declaration is not an authorization, entitlement, health, topology, or private-feature statement.
 
 The arrows express a possible public interoperability flow, not a required CERVEL production pipeline.
 
