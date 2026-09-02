@@ -42,7 +42,9 @@ Public concepts are informative. Normative interoperability behavior exists only
 
 ## License
 
-No open-source license has been granted yet. Until a license is explicitly added, all rights are reserved. Licensing may differ by component.
+Material published in this repository is licensed under the Apache License, Version 2.0 unless a more specific notice states otherwise. See `LICENSE` and `LICENSING.md`.
+
+The license applies only to material actually distributed in this public repository. It does not imply publication or licensing of non-public CERVEL technology.
 
 ## Security
 
@@ -54,4 +56,4 @@ CERVEL is being developed as persistent, sovereign-by-design knowledge infrastru
 
 **One persistent semantic world. Many embodiments. Many intelligences.**
 
-Copyright © 2026 CSIX AI LABS LLC. All rights reserved.
+Copyright © 2026 CSIX AI LABS LLC.
