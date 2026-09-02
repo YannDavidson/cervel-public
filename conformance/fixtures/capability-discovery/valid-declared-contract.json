@@ -1,0 +1,9 @@
+{
+  "version": "0.1-draft",
+  "contracts": [
+    {
+      "name": "lookup-request",
+      "version": "0.1-draft"
+    }
+  ]
+}
