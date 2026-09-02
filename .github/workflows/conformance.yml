@@ -1,0 +1,41 @@
+name: Public conformance
+
+on:
+  pull_request:
+    paths:
+      - "conformance/**"
+      - "schemas/**"
+      - ".github/workflows/conformance.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "conformance/**"
+      - "schemas/**"
+      - ".github/workflows/conformance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate public schemas and fixtures
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: conformance/requirements.txt
+
+      - name: Install validator dependency
+        run: python -m pip install --disable-pip-version-check -r conformance/requirements.txt
+
+      - name: Run public conformance validator
+        run: python conformance/validator.py
