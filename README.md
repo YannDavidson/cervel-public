@@ -10,6 +10,7 @@ CERVEL is built around a simple idea: durable knowledge should remain useful eve
 
 ## Start here
 
+- `docs/python-quickstart.md` — five-minute Python quickstart using only the experimental public SDK and synthetic local examples.
 - `docs/CONCEPTS.md` — public vocabulary for persistent knowledge, identity, source context, access, embodiments, capture, provenance, and traceability.
 - `docs/ARCHITECTURE.md` — deliberately high-level public architecture.
 - `docs/TRUST_PRINCIPLES.md` — security and trust expectations for public interfaces.
