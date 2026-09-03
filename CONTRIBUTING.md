@@ -4,6 +4,8 @@ Thank you for your interest in CERVEL.
 
 This repository is a deliberately reviewed public developer surface. Contributions should improve material that is already public or propose new public-facing work without importing non-public CERVEL information.
 
+Before contributing, read `GOVERNANCE.md`, `DCO.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, and the repository licensing terms.
+
 ## Good contribution areas
 
 We welcome improvements to public documentation, specifications, schemas, examples, compatibility tooling, accessibility, internationalization, and security of components that are explicitly published here.
@@ -12,7 +14,9 @@ We welcome improvements to public documentation, specifications, schemas, exampl
 
 For substantial proposals, open an issue describing the public problem, intended interface, compatibility implications, validation approach, and any intellectual-property considerations that may affect publication.
 
-Do not submit material copied or derived from private repositories, private communications, unreleased documents, confidential deployments, or other non-public sources unless the maintainers have explicitly approved that disclosure before it is pushed to a public branch.
+Do not submit material copied or derived from private repositories, private communications, unreleased documents, confidential deployments, customer data, credentials, embargoed research, or other non-public sources unless the maintainers have explicitly approved that disclosure before it is pushed to a public branch.
+
+If you are unsure whether information is public-safe, do not push it. Ask maintainers privately first.
 
 ## Pull requests
 
@@ -22,17 +26,36 @@ Keep pull requests focused and explain:
 2. why it belongs in the public surface;
 3. compatibility implications;
 4. security and privacy considerations;
-5. how the change was validated.
+5. licensing, provenance, and disclosure considerations;
+6. how the change was validated.
 
-Changes to `schemas/` or `conformance/` are expected to pass the public conformance workflow before merge.
+Changes to published schemas, conformance tooling, SDK material, executable examples, or governance checks are expected to pass the applicable public CI gates before merge.
 
-## Publication boundary
+## DCO sign-off
+
+External contributions are expected to carry a Developer Certificate of Origin style sign-off on each contributed commit. Create signed-off commits with:
+
+```bash
+git commit -s -m "Describe the change"
+```
+
+The commit message must contain a trailer such as:
+
+```text
+Signed-off-by: Contributor Name <contributor@example.com>
+```
+
+See `DCO.md` for what this certification means and how repository enforcement is being rolled out. A cryptographic Git signature does not replace the DCO trailer.
+
+## Publication and IP boundary
 
 > Publication is affirmative, not inferred.
 
 Only material deliberately released in this repository should be treated as public CERVEL material. A public contract does not imply that related non-public implementation is open.
 
-Because this repository is public, disclosure and IP review must happen before potentially sensitive material is pushed to a branch, not merely before merge.
+Because this repository is public, disclosure and IP review must happen before potentially sensitive material is pushed to a branch, not merely before merge. Maintainers may decline technically valid changes when publication could expose non-public implementation details, restricted information, patent-sensitive material, security-sensitive behavior, or commitments beyond the intended public contract.
+
+External contribution does not create a right to merge, roadmap control, access to private systems, or disclosure of non-public technology. See `GOVERNANCE.md`.
 
 ## Security
 
@@ -44,8 +67,8 @@ Material published in this repository is licensed under the Apache License, Vers
 
 Unless explicitly stated otherwise, a contribution intentionally submitted for inclusion in this repository is governed by Section 5 of Apache-2.0. Do not submit code, documentation, specifications, or other material unless you have the right to contribute it under those terms.
 
-The maintainers may require additional contribution governance, such as a Developer Certificate of Origin or Contributor License Agreement, before accepting substantial external executable or patent-relevant contributions. No such additional mechanism is created by this document.
+DCO sign-off supplements these license terms by recording the contributor's certification that they have the right to submit the material. It is not a Contributor License Agreement and does not transfer ownership of unrelated intellectual property.
 
 ## Conduct
 
-Be constructive, technically specific, and respectful.
+Participation is governed by `CODE_OF_CONDUCT.md`. Be constructive, technically specific, and respectful.
