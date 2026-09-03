@@ -7,7 +7,12 @@ on:
       - "schemas/**"
       - "sdk/python/**"
       - "examples/python/**"
+      - "governance/**"
       - "docs/python-quickstart.md"
+      - "CONTRIBUTING.md"
+      - "CODE_OF_CONDUCT.md"
+      - "DCO.md"
+      - "GOVERNANCE.md"
       - ".github/workflows/conformance.yml"
   push:
     branches:
@@ -17,7 +22,12 @@ on:
       - "schemas/**"
       - "sdk/python/**"
       - "examples/python/**"
+      - "governance/**"
       - "docs/python-quickstart.md"
+      - "CONTRIBUTING.md"
+      - "CODE_OF_CONDUCT.md"
+      - "DCO.md"
+      - "GOVERNANCE.md"
       - ".github/workflows/conformance.yml"
 
 permissions:
@@ -25,7 +35,7 @@ permissions:
 
 jobs:
   validate:
-    name: Validate public schemas, fixtures, SDK distributions, and examples
+    name: Validate public schemas, SDK, examples, and governance tooling
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -75,3 +85,6 @@ jobs:
             echo "Running ${example#$GITHUB_WORKSPACE/}"
             /tmp/cervel-sdk-venv/bin/python "$example"
           done
+
+      - name: Test DCO checker behavior
+        run: python -m unittest discover -s governance/tests -v

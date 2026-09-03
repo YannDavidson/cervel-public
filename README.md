@@ -16,6 +16,9 @@ CERVEL is built around a simple idea: durable knowledge should remain useful eve
 - `docs/TRUST_PRINCIPLES.md` — security and trust expectations for public interfaces.
 - `docs/SPECIFICATION_MODEL.md` — how concepts, draft specifications, and stable public contracts are separated.
 - `docs/PUBLIC_PRIVATE_BOUNDARY.md` — the publication and disclosure boundary.
+- `CONTRIBUTING.md` — contribution workflow, sign-off, licensing, and disclosure requirements.
+- `GOVERNANCE.md` — maintainer decision boundary and public-repository governance.
+- `CODE_OF_CONDUCT.md` — participation expectations.
 
 ## Repository status
 
@@ -31,6 +34,7 @@ protocols/   Approved interoperability contracts
 schemas/     Approved public schemas
 sdk/         Developer tooling for published interfaces
 examples/    Public-safe examples
+governance/  Public contribution-governance validation tooling
 ```
 
 Every new public contract or implementation should pass disclosure, security, privacy, and intellectual-property review before publication.
