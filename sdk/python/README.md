@@ -36,13 +36,25 @@ payload = result.to_dict()
 
 The resulting payload is expected to validate against the published Lookup Result schema, including its `$ref` to the public Knowledge Reference schema.
 
-## Development
+## Development and packaging verification
 
-From the repository root, after installing `conformance/requirements.txt`, run:
+From the repository root, install the pinned validation and build dependencies:
 
 ```bash
-python -m unittest discover -s sdk/python/tests -v
-python conformance/validator.py
+python -m pip install -r conformance/requirements.txt -r sdk/python/requirements-build.txt
 ```
 
-No package publication or external service access is performed by these tests.
+Then run the source contract checks and build both distribution formats:
+
+```bash
+python conformance/validator.py
+python sdk/python/tests/test_conformance.py
+python -m build --no-isolation --sdist --wheel --outdir sdk/python/dist sdk/python
+python sdk/python/tests/test_distribution.py
+```
+
+CI additionally installs the built wheel into a fresh virtual environment with `--no-index --no-deps` and smoke-tests it from outside the repository source tree. This proves that the artifact itself is importable without accidentally resolving `cervel_public` from the checkout.
+
+The package declares no runtime dependencies. Build tooling is directly pinned, but this experimental rollout does not claim a fully hash-locked or hermetic transitive Python dependency graph.
+
+No package publication, artifact upload, external CERVEL service access, or production compatibility claim is performed by these checks.

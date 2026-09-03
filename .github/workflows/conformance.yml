@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   validate:
-    name: Validate public schemas, fixtures, and SDK
+    name: Validate public schemas, fixtures, and SDK distributions
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -34,13 +34,29 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: conformance/requirements.txt
+          cache-dependency-path: |
+            conformance/requirements.txt
+            sdk/python/requirements-build.txt
 
-      - name: Install validator dependency
-        run: python -m pip install --disable-pip-version-check -r conformance/requirements.txt
+      - name: Install validation and build dependencies
+        run: python -m pip install --disable-pip-version-check -r conformance/requirements.txt -r sdk/python/requirements-build.txt
 
       - name: Run public conformance validator
         run: python conformance/validator.py
 
-      - name: Run Python SDK schema-conformance tests
-        run: python -m unittest discover -s sdk/python/tests -v
+      - name: Run Python SDK source schema-conformance tests
+        run: python sdk/python/tests/test_conformance.py
+
+      - name: Build Python SDK wheel and source distribution
+        run: python -m build --no-isolation --sdist --wheel --outdir sdk/python/dist sdk/python
+
+      - name: Verify Python SDK distribution contents
+        run: python sdk/python/tests/test_distribution.py
+
+      - name: Install built wheel without network access
+        run: |
+          python -m venv /tmp/cervel-sdk-venv
+          /tmp/cervel-sdk-venv/bin/python -m pip install --disable-pip-version-check --no-index --no-deps sdk/python/dist/*.whl
+
+      - name: Smoke-test installed wheel outside source tree
+        run: cd /tmp && /tmp/cervel-sdk-venv/bin/python "$GITHUB_WORKSPACE/sdk/python/tests/smoke_installed.py"
