@@ -5,6 +5,7 @@ on:
     paths:
       - "conformance/**"
       - "schemas/**"
+      - "sdk/python/**"
       - ".github/workflows/conformance.yml"
   push:
     branches:
@@ -12,6 +13,7 @@ on:
     paths:
       - "conformance/**"
       - "schemas/**"
+      - "sdk/python/**"
       - ".github/workflows/conformance.yml"
 
 permissions:
@@ -19,7 +21,7 @@ permissions:
 
 jobs:
   validate:
-    name: Validate public schemas and fixtures
+    name: Validate public schemas, fixtures, and SDK
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -39,3 +41,6 @@ jobs:
 
       - name: Run public conformance validator
         run: python conformance/validator.py
+
+      - name: Run Python SDK schema-conformance tests
+        run: python -m unittest discover -s sdk/python/tests -v
