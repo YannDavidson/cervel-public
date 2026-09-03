@@ -9,10 +9,9 @@ description = "Typed convenience models for CERVEL public experimental interoper
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 classifiers = [
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: Apache Software License",
 ]
 
 [tool.setuptools]
