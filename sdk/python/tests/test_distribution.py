@@ -31,6 +31,7 @@ class DistributionIntegrityTests(unittest.TestCase):
             self.assertIn("Name: cervel-public", metadata)
             self.assertIn(f"Version: {EXPECTED_VERSION}", metadata)
             self.assertIn("Requires-Python: >=3.10", metadata)
+            self.assertIn("License-Expression: Apache-2.0", metadata)
 
     def test_sdist_contains_declared_public_source(self) -> None:
         sdist = next(DIST_DIR.glob("*.tar.gz"))
