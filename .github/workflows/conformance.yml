@@ -6,6 +6,8 @@ on:
       - "conformance/**"
       - "schemas/**"
       - "sdk/python/**"
+      - "examples/python/**"
+      - "docs/python-quickstart.md"
       - ".github/workflows/conformance.yml"
   push:
     branches:
@@ -14,6 +16,8 @@ on:
       - "conformance/**"
       - "schemas/**"
       - "sdk/python/**"
+      - "examples/python/**"
+      - "docs/python-quickstart.md"
       - ".github/workflows/conformance.yml"
 
 permissions:
@@ -21,7 +25,7 @@ permissions:
 
 jobs:
   validate:
-    name: Validate public schemas, fixtures, and SDK distributions
+    name: Validate public schemas, fixtures, SDK distributions, and examples
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -60,3 +64,14 @@ jobs:
 
       - name: Smoke-test installed wheel outside source tree
         run: cd /tmp && /tmp/cervel-sdk-venv/bin/python "$GITHUB_WORKSPACE/sdk/python/tests/smoke_installed.py"
+
+      - name: Execute every published Python example against installed wheel
+        shell: bash
+        run: |
+          mapfile -t examples < <(find "$GITHUB_WORKSPACE/examples/python" -maxdepth 1 -type f -name '*.py' | sort)
+          test "${#examples[@]}" -gt 0
+          cd /tmp
+          for example in "${examples[@]}"; do
+            echo "Running ${example#$GITHUB_WORKSPACE/}"
+            /tmp/cervel-sdk-venv/bin/python "$example"
+          done
