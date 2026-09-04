@@ -28,10 +28,16 @@ The contributor certifies that, to the best of their knowledge:
 4. they understand that a contribution accepted into this public repository becomes publicly accessible and may be redistributed under the repository license;
 5. the sign-off does not grant access to, disclose, or change the status of non-public CERVEL technology.
 
-## Checking strategy
+## Automated checking
 
-`governance/check_dco.py` provides the repository-owned parser used to detect a valid `Signed-off-by: Name <email>` trailer in commit messages. Its behavior is covered by unit tests in `governance/tests/`.
+`governance/check_dco.py` provides the repository-owned parser used to detect a valid `Signed-off-by: Name <email>` trailer in commit messages. `governance/check_pr_dco.py` obtains the commit metadata for the active pull request and requires every commit in that pull request to contain a valid sign-off. Both behaviors are covered by deterministic tests in `governance/tests/`.
 
-This foundation PR intentionally does **not** enforce DCO against its own bootstrap commits. The next enforcement rollout can wire the tested checker to pull-request commit metadata and make that status check required for external contribution branches. Until automated enforcement is enabled, maintainers should require sign-off during review for external contributions.
+The dedicated `DCO sign-off` status check runs from `.github/workflows/dco.yml` using the `pull_request_target` event. The workflow checks out only the trusted base revision and reads pull-request commit metadata through the GitHub API; it does not check out or execute contributor code. Its token is explicitly limited to `contents: read` and `pull-requests: read`.
+
+The gate fails closed if commit metadata cannot be retrieved completely and rejects pull requests above GitHub's 250-commit pull-request commit limit. Contributors should split unusually large changes into smaller pull requests.
+
+Because the workflow is evaluated from the trusted base branch, a pull request cannot weaken its own required DCO status by modifying `.github/workflows/dco.yml` or the governance checker in that same pull request. Changes to the enforcement implementation take effect only after they are separately reviewed and merged into the base branch.
+
+This status is designed to be suitable for branch-protection or ruleset enforcement as a required check. Repository protection configuration is a separate administrative control from the workflow itself.
 
 This policy supplements, and does not replace, `LICENSE`, `LICENSING.md`, `CONTRIBUTING.md`, `SECURITY.md`, or the repository's disclosure-review requirements.
