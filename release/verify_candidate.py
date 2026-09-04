@@ -4,10 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
+import io
 import json
 import shutil
 import sys
+import tarfile
 import tomllib
 from pathlib import Path
 
@@ -68,13 +71,49 @@ def digest(path: Path) -> str:
     return h.hexdigest()
 
 
+def canonicalize_sdist(directory: Path, epoch: int) -> None:
+    sdists = list(directory.glob("*.tar.gz"))
+    if len(sdists) != 1:
+        raise SystemExit(f"expected exactly one sdist in {directory}, found {len(sdists)}")
+    source = sdists[0]
+    entries: list[tuple[tarfile.TarInfo, bytes | None]] = []
+    with tarfile.open(source, "r:gz") as archive:
+        for member in sorted(archive.getmembers(), key=lambda item: item.name):
+            payload: bytes | None = None
+            if member.isfile():
+                extracted = archive.extractfile(member)
+                if extracted is None:
+                    raise SystemExit(f"could not read sdist member {member.name}")
+                payload = extracted.read()
+            normalized = tarfile.TarInfo(member.name)
+            normalized.type = member.type
+            normalized.linkname = member.linkname
+            normalized.mode = member.mode
+            normalized.uid = 0
+            normalized.gid = 0
+            normalized.uname = ""
+            normalized.gname = ""
+            normalized.mtime = epoch
+            normalized.size = len(payload) if payload is not None else 0
+            entries.append((normalized, payload))
+
+    temporary = source.with_suffix(source.suffix + ".canonical")
+    with temporary.open("wb") as raw:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=epoch) as zipped:
+            with tarfile.open(fileobj=zipped, mode="w", format=tarfile.PAX_FORMAT) as archive:
+                for member, payload in entries:
+                    archive.addfile(member, io.BytesIO(payload) if payload is not None else None)
+    temporary.replace(source)
+    print(f"PASS canonicalized {source.name}: {digest(source)}")
+
+
 def compare_builds(first: Path, second: Path) -> None:
     first_files = artifact_files(first)
     second_files = artifact_files(second)
     first_map = {path.name: digest(path) for path in first_files}
     second_map = {path.name: digest(path) for path in second_files}
     if first_map != second_map:
-        print("FAIL release builds are not byte-for-byte reproducible", file=sys.stderr)
+        print("FAIL canonical release builds are not byte-for-byte reproducible", file=sys.stderr)
         print(json.dumps({"first": first_map, "second": second_map}, indent=2), file=sys.stderr)
         raise SystemExit(1)
     for name, sha in first_map.items():
@@ -106,6 +145,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("metadata")
+    normalize = sub.add_parser("normalize-sdist")
+    normalize.add_argument("directory", type=Path)
+    normalize.add_argument("--epoch", type=int, required=True)
     compare = sub.add_parser("compare")
     compare.add_argument("first", type=Path)
     compare.add_argument("second", type=Path)
@@ -116,6 +158,8 @@ def main() -> None:
 
     if args.command == "metadata":
         verify_metadata()
+    elif args.command == "normalize-sdist":
+        canonicalize_sdist(args.directory, args.epoch)
     elif args.command == "compare":
         compare_builds(args.first, args.second)
     elif args.command == "stage":
