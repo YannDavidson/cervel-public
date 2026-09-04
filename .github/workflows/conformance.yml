@@ -14,6 +14,7 @@ on:
       - "DCO.md"
       - "GOVERNANCE.md"
       - ".github/workflows/conformance.yml"
+      - ".github/workflows/dco.yml"
   push:
     branches:
       - main
@@ -29,6 +30,7 @@ on:
       - "DCO.md"
       - "GOVERNANCE.md"
       - ".github/workflows/conformance.yml"
+      - ".github/workflows/dco.yml"
 
 permissions:
   contents: read

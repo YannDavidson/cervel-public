@@ -33,7 +33,7 @@ Changes to published schemas, conformance tooling, SDK material, executable exam
 
 ## DCO sign-off
 
-External contributions are expected to carry a Developer Certificate of Origin style sign-off on each contributed commit. Create signed-off commits with:
+External contributions must carry a Developer Certificate of Origin style sign-off on each contributed commit. Create signed-off commits with:
 
 ```bash
 git commit -s -m "Describe the change"
@@ -45,7 +45,9 @@ The commit message must contain a trailer such as:
 Signed-off-by: Contributor Name <contributor@example.com>
 ```
 
-See `DCO.md` for what this certification means and how repository enforcement is being rolled out. A cryptographic Git signature does not replace the DCO trailer.
+The repository's `DCO sign-off` status check verifies every pull-request commit. If any commit is missing a valid trailer, update or recreate that commit with `git commit --amend -s` or an equivalent signed-off history edit, then push the corrected branch.
+
+See `DCO.md` for what this certification means and how the automated gate is isolated from contributor code. A cryptographic Git signature does not replace the DCO trailer.
 
 ## Publication and IP boundary
 
