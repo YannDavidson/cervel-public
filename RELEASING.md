@@ -24,9 +24,11 @@ Tests remain in the repository and CI because they validate the artifact boundar
 
 ## Reproducibility and checksums
 
-The release-candidate CI builds the wheel and sdist twice from the same checked-out source using the pinned build toolchain, `PYTHONHASHSEED=0`, and a fixed `SOURCE_DATE_EPOCH`. The two builds must be byte-for-byte identical before they are accepted as a candidate.
+The release-candidate CI builds the wheel and sdist twice from the same checked-out source using the pinned build toolchain, `PYTHONHASHSEED=0`, and a fixed `SOURCE_DATE_EPOCH`. The wheel is compared directly. Because setuptools' gzip/tar container metadata is not itself stable across otherwise identical sdist builds, each sdist is canonicalized before comparison by fixing gzip/tar timestamps and ownership metadata and sorting archive members. File contents, names, modes, links, and release payload remain subject to exact comparison.
 
-The accepted candidate is staged only after that comparison passes. CI then generates `sdk/python/dist/SHA256SUMS` containing SHA-256 digests for the exact wheel and sdist. Checksums are evidence for the candidate produced by that exact run; they are not a substitute for selecting and recording the final release commit SHA.
+After canonicalization, the wheel and sdist pairs must be byte-for-byte identical before they are accepted as a candidate. The accepted candidate is then staged and CI generates `sdk/python/dist/SHA256SUMS` containing SHA-256 digests for the exact wheel and canonical sdist.
+
+Checksums are evidence for the candidate produced by that exact run; they are not a substitute for selecting and recording the final release commit SHA.
 
 ## Alpha release gate
 
@@ -36,8 +38,8 @@ Before any external publication:
 2. confirm the `DCO sign-off` and Public conformance checks are successful on the release-preparation PR;
 3. verify `release/alpha-0.1.0.json`, `pyproject.toml`, `CHANGELOG.md`, release notes, and this document agree on `0.1.0-alpha`, `0.1.0a0`, and `v0.1.0-alpha.0`;
 4. build wheel and sdist twice from the exact release source with the pinned build tooling and deterministic build environment;
-5. require the two builds to be byte-for-byte identical;
-6. generate and inspect SHA-256 checksums for the accepted wheel and sdist;
+5. canonicalize only the sdist container metadata and require both candidate pairs to be byte-for-byte identical;
+6. generate and inspect SHA-256 checksums for the accepted wheel and canonical sdist;
 7. run distribution integrity tests, offline wheel installation, installed-wheel smoke tests, all published examples, and public schema/conformance tests;
 8. inspect both archives and verify the Apache-2.0 license is present and repository tests/private surfaces are absent;
 9. scan the exact release diff and artifacts for secrets, private identifiers, production endpoints, customer information, or unpublished CERVEL runtime semantics;
