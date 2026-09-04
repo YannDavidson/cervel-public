@@ -74,7 +74,7 @@ jobs:
       - name: Verify frozen alpha release metadata
         run: python release/verify_candidate.py metadata
 
-      - name: Build release candidate twice deterministically
+      - name: Build release candidate twice
         env:
           SOURCE_DATE_EPOCH: "315532800"
           PYTHONHASHSEED: "0"
@@ -83,6 +83,11 @@ jobs:
           python -m build --no-isolation --sdist --wheel --outdir /tmp/cervel-build-a sdk/python
           rm -rf sdk/python/build sdk/python/cervel_public.egg-info
           python -m build --no-isolation --sdist --wheel --outdir /tmp/cervel-build-b sdk/python
+
+      - name: Canonicalize source-distribution container metadata
+        run: |
+          python release/verify_candidate.py normalize-sdist /tmp/cervel-build-a --epoch 315532800
+          python release/verify_candidate.py normalize-sdist /tmp/cervel-build-b --epoch 315532800
 
       - name: Verify byte-for-byte reproducibility
         run: python release/verify_candidate.py compare /tmp/cervel-build-a /tmp/cervel-build-b
