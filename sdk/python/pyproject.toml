@@ -10,9 +10,16 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
 license = "Apache-2.0"
+license-files = ["LICENSE"]
 classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
   "Programming Language :: Python :: 3",
 ]
+
+[project.urls]
+Homepage = "https://cervel.ai"
+Repository = "https://github.com/YannDavidson/cervel-public"
 
 [tool.setuptools]
 include-package-data = false
