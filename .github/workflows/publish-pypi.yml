@@ -1,0 +1,92 @@
+name: Publish Python package to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Select the exact approved publication action."
+        required: true
+        type: choice
+        options:
+          - do-not-publish
+          - publish-v0.1.0-alpha.0
+        default: do-not-publish
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish frozen alpha candidate to PyPI
+    if: ${{ inputs.confirmation == 'publish-v0.1.0-alpha.0' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out exact release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: v0.1.0-alpha.0
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Verify exact release commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="c79ed8b89e346dc89077fecdc7030a9d4897e73d"
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$expected"
+          echo "Verified release commit: $actual"
+
+      - name: Download published GitHub release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/cervel-release /tmp/pypi-dist
+          mkdir -p /tmp/cervel-release /tmp/pypi-dist
+          gh release download v0.1.0-alpha.0 \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern 'cervel_public-0.1.0a0-py3-none-any.whl' \
+            --pattern 'cervel_public-0.1.0a0.tar.gz' \
+            --pattern 'SHA256SUMS' \
+            --dir /tmp/cervel-release
+          test "$(find /tmp/cervel-release -maxdepth 1 -type f | wc -l | tr -d ' ')" = "3"
+
+      - name: Verify frozen release checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/EXPECTED_SHA256SUMS <<'EOF'
+          9ec8e835977a0b0d736a614399bfc1985aefb40d1033ba08f8058327a3a2cbf8  cervel_public-0.1.0a0-py3-none-any.whl
+          3c3325c12d5a42dce5d8e81690e8767926272bc10c770c1c9934fe6464c750d2  cervel_public-0.1.0a0.tar.gz
+          EOF
+          cmp /tmp/EXPECTED_SHA256SUMS /tmp/cervel-release/SHA256SUMS
+          cd /tmp/cervel-release
+          sha256sum -c SHA256SUMS
+          cp cervel_public-0.1.0a0-py3-none-any.whl /tmp/pypi-dist/
+          cp cervel_public-0.1.0a0.tar.gz /tmp/pypi-dist/
+          test "$(find /tmp/pypi-dist -maxdepth 1 -type f | wc -l | tr -d ' ')" = "2"
+
+      - name: Verify distribution boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf sdk/python/dist
+          mkdir -p sdk/python/dist
+          cp /tmp/pypi-dist/* sdk/python/dist/
+          python sdk/python/tests/test_distribution.py
+
+      - name: Publish exact distributions with PyPI Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: /tmp/pypi-dist
+          verify-metadata: true
+          skip-existing: false
+          attestations: true
