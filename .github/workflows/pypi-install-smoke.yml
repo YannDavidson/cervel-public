@@ -32,31 +32,42 @@ jobs:
       - name: Create clean verification environment
         run: python -m venv /tmp/cervel-pypi-venv
 
-      - name: Install exact published package from PyPI
+      - name: Install exact published package and validation extra from PyPI
         run: |
           /tmp/cervel-pypi-venv/bin/python -m pip install \
             --disable-pip-version-check \
             --no-cache-dir \
             --index-url https://pypi.org/simple \
-            cervel-public==0.1.0a0
+            'cervel-public[validation]==0.1.0a1'
 
-      - name: Verify package identity and import location
+      - name: Verify package identity, import location, and local validation
         shell: bash
         run: |
           cd /tmp
           /tmp/cervel-pypi-venv/bin/python - <<'PY'
           import importlib.metadata
           import pathlib
+
           import cervel_public
+          from cervel_public import CaptureEnvelope, validate_capture_envelope
 
           version = importlib.metadata.version("cervel-public")
           module_path = pathlib.Path(cervel_public.__file__).resolve()
           workspace = pathlib.Path("${{ github.workspace }}").resolve()
 
-          assert version == "0.1.0a0", version
+          assert version == "0.1.0a1", version
           assert workspace not in module_path.parents, module_path
+
+          capture = CaptureEnvelope(
+              content="The design review is scheduled for Friday.",
+              content_type="text/plain",
+              title="Synthetic project note",
+          )
+          validate_capture_envelope(capture)
+
           print(f"Verified cervel-public {version}")
           print(f"Imported from {module_path}")
+          print("Validated CaptureEnvelope locally against the published schema")
           PY
 
       - name: Run every public example against PyPI-installed package
