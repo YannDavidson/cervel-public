@@ -1,14 +1,32 @@
 # CERVEL Public Python SDK — API Reference
 
-This document describes the deliberately public Python API shipped in `cervel-public==0.1.0a0`.
+This document describes the deliberately public Python SDK surface. The currently published PyPI release is `cervel-public==0.1.0a0`; the repository is preparing `0.1.0a1`, which adds the optional local validation helpers documented below.
 
-Install the current public alpha from PyPI:
+Install the current published alpha from PyPI:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install cervel-public==0.1.0a0
 ```
+
+The prepared validation helpers will require the optional extra when `0.1.0a1` is explicitly published:
+
+```bash
+python -m pip install 'cervel-public[validation]==0.1.0a1'
+```
+
+## Public/private boundary
+
+The Python package is a convenience layer over the published experimental CERVEL contracts. It provides immutable typed objects, JSON-compatible serialization helpers, and—starting with the prepared `0.1.0a1` candidate—optional local JSON Schema validation.
+
+It does **not** implement or expose CERVEL networking, service endpoints, authentication, authorization, permission-aware activation, retrieval, ranking, persistence, provenance processing, knowledge compilation, synchronization, model routing, agent orchestration, private storage, or production runtime behavior.
+
+The public JSON Schemas remain the authoritative contract surface. The Python classes and validators are developer conveniences that mirror the deliberately published example schemas.
+
+## Public models
+
+The model API remains unchanged from `0.1.0a0`:
 
 ```python
 from cervel_public import (
@@ -24,16 +42,6 @@ from cervel_public import (
 )
 ```
 
-## Public/private boundary
-
-The Python package is a convenience layer over the published experimental CERVEL contracts. It provides immutable typed objects and JSON-compatible serialization helpers.
-
-It does **not** implement or expose CERVEL networking, service endpoints, authentication, authorization, permission-aware activation, retrieval, ranking, persistence, provenance processing, knowledge compilation, synchronization, model routing, agent orchestration, private storage, or production runtime behavior.
-
-The public JSON Schemas remain the authoritative contract surface. The Python classes are developer conveniences that mirror the deliberately published example schemas.
-
-## Version constant
-
 ### `PUBLIC_DRAFT_VERSION`
 
 ```python
@@ -42,11 +50,7 @@ PUBLIC_DRAFT_VERSION == "0.1-draft"
 
 The convenience models use this value as their default public contract version unless a field explicitly requires another value.
 
----
-
-## `CaptureEnvelope`
-
-Represents a public capture-envelope payload. Constructing this object does not submit, store, synchronize, or persist anything.
+### `CaptureEnvelope`
 
 ```python
 CaptureEnvelope(
@@ -58,35 +62,9 @@ CaptureEnvelope(
 )
 ```
 
-Fields:
+Represents a public capture-envelope payload. Constructing it does not submit, store, synchronize, or persist anything. `to_dict()` returns a JSON-compatible dictionary and omits optional fields whose value is `None`.
 
-- `content` — required text content represented by the envelope.
-- `version` — public contract version; defaults to `"0.1-draft"`.
-- `content_type` — optional content-type label, such as `"text/plain"`.
-- `source` — optional caller-supplied source label.
-- `title` — optional caller-supplied title.
-
-Example:
-
-```python
-from cervel_public import CaptureEnvelope
-
-capture = CaptureEnvelope(
-    content="The design review is scheduled for Friday.",
-    content_type="text/plain",
-    title="Synthetic project note",
-)
-
-payload = capture.to_dict()
-```
-
-`to_dict()` returns a JSON-compatible dictionary and omits optional fields whose value is `None`.
-
----
-
-## `LookupRequest`
-
-Represents the shape of a public lookup-request payload. Constructing it does not execute retrieval.
+### `LookupRequest`
 
 ```python
 LookupRequest(
@@ -97,34 +75,9 @@ LookupRequest(
 )
 ```
 
-Fields:
+Represents the shape of a public lookup-request payload. Constructing it does not execute retrieval. `to_dict()` omits optional fields whose value is `None`.
 
-- `query` — required lookup text.
-- `version` — public contract version; defaults to `"0.1-draft"`.
-- `limit` — optional caller-supplied result limit.
-- `scope` — optional public scope label.
-
-Example:
-
-```python
-from cervel_public import LookupRequest
-
-request = LookupRequest(
-    query="When is the design review?",
-    limit=3,
-    scope="public-example",
-)
-
-payload = request.to_dict()
-```
-
-`to_dict()` omits optional fields whose value is `None`.
-
----
-
-## `KnowledgeReference`
-
-Represents a reference object used by the public lookup-result contract.
+### `KnowledgeReference`
 
 ```python
 KnowledgeReference(
@@ -135,31 +88,9 @@ KnowledgeReference(
 )
 ```
 
-Fields:
+Represents the public reference object used by lookup results. It does not expose internal identifiers, resolution services, provenance engines, permission checks, storage locations, or private CKURI behavior.
 
-- `id` — required reference identifier.
-- `version` — public contract version; defaults to `"0.1-draft"`.
-- `kind` — optional public type label.
-- `source` — optional caller-supplied source label.
-
-Example:
-
-```python
-from cervel_public import KnowledgeReference
-
-reference = KnowledgeReference(
-    id="example-knowledge-1",
-    kind="note",
-)
-```
-
-A `KnowledgeReference` is a public data structure only. It does not expose internal identifiers, resolution services, provenance engines, permission checks, storage locations, or private CKURI behavior.
-
----
-
-## `LookupResultItem`
-
-Represents one item in a synthetic or externally obtained public lookup-result payload.
+### `LookupResultItem`
 
 ```python
 LookupResultItem(
@@ -168,29 +99,9 @@ LookupResultItem(
 )
 ```
 
-Fields:
+Represents one item in a synthetic or externally obtained public lookup-result payload. `to_dict()` serializes the nested reference and omits `text` when it is `None`.
 
-- `reference` — required `KnowledgeReference`.
-- `text` — optional public text associated with the item.
-
-Example:
-
-```python
-from cervel_public import KnowledgeReference, LookupResultItem
-
-item = LookupResultItem(
-    reference=KnowledgeReference(id="example-knowledge-1", kind="note"),
-    text="The design review is scheduled for Friday.",
-)
-```
-
-`to_dict()` serializes the nested reference and omits `text` when it is `None`.
-
----
-
-## `LookupResult`
-
-Represents a public lookup-result payload as an immutable tuple of `LookupResultItem` objects.
+### `LookupResult`
 
 ```python
 LookupResult(
@@ -199,35 +110,9 @@ LookupResult(
 )
 ```
 
-Fields:
+Represents a public lookup-result payload as an immutable tuple of `LookupResultItem` objects. The SDK does not retrieve, rank, authorize, score, enrich, or generate these items.
 
-- `items` — required tuple of public result items.
-- `version` — public contract version; defaults to `"0.1-draft"`.
-
-Example:
-
-```python
-from cervel_public import KnowledgeReference, LookupResult, LookupResultItem
-
-result = LookupResult(
-    items=(
-        LookupResultItem(
-            reference=KnowledgeReference(id="example-knowledge-1", kind="note"),
-            text="The design review is scheduled for Friday.",
-        ),
-    )
-)
-
-payload = result.to_dict()
-```
-
-The SDK does not retrieve, rank, authorize, score, enrich, or generate these items. The class only represents the published result shape.
-
----
-
-## `ErrorEnvelope`
-
-Represents the public experimental error-envelope shape.
+### `ErrorEnvelope`
 
 ```python
 ErrorEnvelope(
@@ -237,36 +122,9 @@ ErrorEnvelope(
 )
 ```
 
-Fields:
-
-- `code` — required public error code.
-- `version` — public contract version; defaults to `"0.1-draft"`.
-- `message` — optional human-readable message.
-
-Example:
-
-```python
-from cervel_public import ErrorEnvelope
-
-error = ErrorEnvelope(
-    code="example_error",
-    message="Synthetic public example.",
-)
-
-payload = error.to_dict()
-```
-
-This object does not define transport semantics, HTTP status mapping, retry behavior, internal exceptions, or production error handling.
-
----
-
-## Capability discovery
-
-Capability discovery is represented by two public data classes: `CapabilityContract` and `CapabilityDiscovery`.
+Represents the public experimental error-envelope shape. It does not define transport semantics, HTTP status mapping, retry behavior, internal exceptions, or production error handling.
 
 ### `CapabilityContract`
-
-Represents one advertised public contract name/version pair.
 
 ```python
 CapabilityContract(
@@ -275,29 +133,9 @@ CapabilityContract(
 )
 ```
 
-Example:
-
-```python
-from cervel_public import CapabilityContract
-
-contract = CapabilityContract(
-    name="capture-envelope",
-    version="0.1-draft",
-)
-```
-
-`to_dict()` returns:
-
-```python
-{
-    "name": "capture-envelope",
-    "version": "0.1-draft",
-}
-```
+Represents one advertised public contract name/version pair.
 
 ### `CapabilityDiscovery`
-
-Represents a public capability-discovery document containing a tuple of `CapabilityContract` values.
 
 ```python
 CapabilityDiscovery(
@@ -306,24 +144,95 @@ CapabilityDiscovery(
 )
 ```
 
+Represents a public capability-discovery document. It does not perform service discovery, endpoint negotiation, authentication, feature authorization, runtime routing, or private implementation introspection.
+
+## Local contract validation — prepared for `0.1.0a1`
+
+Validation is entirely local and operates only on the six schemas already published in `schemas/`. The base SDK remains dependency-free; validation uses the optional `validation` extra.
+
+### `SUPPORTED_CONTRACTS`
+
+The exact generic-validator contract names are:
+
+```python
+(
+    "capture-envelope",
+    "lookup-request",
+    "knowledge-reference",
+    "lookup-result",
+    "error-envelope",
+    "capability-discovery",
+)
+```
+
+### `get_public_schema(contract)`
+
+Returns a defensive copy of the embedded public schema for a supported contract. An unsupported contract raises `UnsupportedContractError`.
+
+```python
+from cervel_public import get_public_schema
+
+schema = get_public_schema("lookup-request")
+```
+
+The embedded representations are not a second source of authority: repository tests require them to remain exactly equal to the corresponding published JSON files.
+
+### `validate_payload(contract, value)`
+
+Validates either a mapping or an SDK object exposing `to_dict()`.
+
+```python
+from cervel_public import LookupRequest, validate_payload
+
+request = LookupRequest(query="When is the design review?", limit=3)
+validate_payload("lookup-request", request)
+```
+
+The function returns `None` on success and raises `ContractValidationError` on schema failure.
+
+### Specialized helpers
+
+```python
+validate_capture_envelope(value)
+validate_lookup_request(value)
+validate_knowledge_reference(value)
+validate_lookup_result(value)
+validate_error_envelope(value)
+validate_capability_discovery(value)
+```
+
+Each is a thin local wrapper over `validate_payload()` using the corresponding published contract.
+
 Example:
 
 ```python
-from cervel_public import CapabilityContract, CapabilityDiscovery
+from cervel_public import CaptureEnvelope, validate_capture_envelope
 
-discovery = CapabilityDiscovery(
-    contracts=(
-        CapabilityContract(name="capture-envelope", version="0.1-draft"),
-        CapabilityContract(name="lookup-request", version="0.1-draft"),
-    )
+capture = CaptureEnvelope(
+    content="The design review is scheduled for Friday.",
+    content_type="text/plain",
 )
-
-payload = discovery.to_dict()
+validate_capture_envelope(capture)
 ```
 
-Capability discovery describes advertised public contract identifiers only. It does not perform service discovery, endpoint negotiation, authentication, feature authorization, runtime routing, or private implementation introspection.
+### `validation_errors(contract, value)`
 
----
+Returns a tuple of stable human-readable schema-error strings without raising for ordinary schema failures.
+
+```python
+from cervel_public import validation_errors
+
+issues = validation_errors(
+    "lookup-request",
+    {"version": "0.1-draft", "query": "example", "limit": -1},
+)
+```
+
+### Validation exceptions
+
+- `ContractValidationError` — payload does not satisfy the selected public schema. Exposes `.contract` and `.errors`.
+- `UnsupportedContractError` — caller requested a contract outside the deliberately supported public schema set.
+- `ValidationDependencyError` — validation was invoked without the optional validation dependency installed.
 
 ## Immutability and serialization
 
@@ -331,26 +240,15 @@ All public SDK models are frozen Python dataclasses. After construction, their f
 
 Each model exposes `to_dict()` to produce JSON-compatible public data. For models with optional scalar fields, values set to `None` are omitted. Collection-bearing models serialize nested public objects recursively.
 
-Example:
-
-```python
-from cervel_public import CaptureEnvelope
-
-capture = CaptureEnvelope(content="Example")
-
-assert capture.to_dict() == {
-    "version": "0.1-draft",
-    "content": "Example",
-}
-```
-
 ## Contract authority
 
 When Python convenience behavior and a published JSON Schema are compared, the versioned public schema is the normative interoperability artifact. The SDK exists to make those published shapes easier to use from Python.
 
+Validation helpers do not grant authority, access, permission, provenance status, or production compatibility. A payload passing a public schema means only that its public shape conforms to that experimental contract.
+
 See also:
 
 - `docs/python-quickstart.md` — end-to-end synthetic Python examples.
-- `schemas/` — published JSON Schemas.
+- `schemas/` — authoritative published JSON Schemas.
 - `docs/PUBLIC_PRIVATE_BOUNDARY.md` — disclosure boundary.
 - `docs/SPECIFICATION_MODEL.md` — distinction between concepts, drafts, and stable contracts.

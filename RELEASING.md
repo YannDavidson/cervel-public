@@ -6,15 +6,21 @@ CERVEL Public uses a deliberate release gate. Merging release-readiness changes 
 
 The public repository uses semantic release labels for human-facing release communication and PEP 440 versions for the Python distribution.
 
-For the first alpha release family:
+Published first alpha:
 
 - public release label: `0.1.0-alpha`;
 - Python package version: `0.1.0a0`;
-- prepared first tag: `v0.1.0-alpha.0`.
+- published tag: `v0.1.0-alpha.0`.
 
-The machine-checkable candidate identity is recorded in `release/alpha-0.1.0.json`. Until an explicit release action selects the exact post-merge `main` commit, `tag_target_sha` must remain `null` and the manifest status must remain `prepared-not-published`.
+Current prepared candidate:
 
-If another alpha candidate is required before a stable release, increment both the tag suffix and Python alpha serial together, for example `v0.1.0-alpha.1` and `0.1.0a1`.
+- public release label: `0.1.0-alpha.1`;
+- Python package version: `0.1.0a1`;
+- prepared tag: `v0.1.0-alpha.1`.
+
+The machine-checkable current candidate identity is recorded in `release/alpha-0.1.0-a1.json`. Until an explicit release action selects the exact post-merge `main` commit, `tag_target_sha` must remain `null` and the manifest status must remain `prepared-not-published`.
+
+Published versions and tags are immutable. The prior `0.1.0a0` / `v0.1.0-alpha.0` release remains unchanged while the next candidate advances independently.
 
 ## Release artifact policy
 
@@ -32,23 +38,25 @@ Checksums are evidence for the candidate produced by that exact run; they are no
 
 ## Alpha release gate
 
-Before any external publication:
+Before any external publication of the current candidate:
 
 1. select the exact post-merge `main` commit intended for release and record its SHA;
 2. confirm the `DCO sign-off` and Public conformance checks are successful on the release-preparation PR;
-3. verify `release/alpha-0.1.0.json`, `pyproject.toml`, `CHANGELOG.md`, release notes, and this document agree on `0.1.0-alpha`, `0.1.0a0`, and `v0.1.0-alpha.0`;
+3. verify `release/alpha-0.1.0-a1.json`, `pyproject.toml`, `CHANGELOG.md`, release notes, and this document agree on `0.1.0-alpha.1`, `0.1.0a1`, and `v0.1.0-alpha.1`;
 4. build wheel and sdist twice from the exact release source with the pinned build tooling and deterministic build environment;
 5. canonicalize only the sdist container metadata and require both candidate pairs to be byte-for-byte identical;
 6. generate and inspect SHA-256 checksums for the accepted wheel and canonical sdist;
-7. run distribution integrity tests, offline wheel installation, installed-wheel smoke tests, all published examples, and public schema/conformance tests;
-8. inspect both archives and verify the Apache-2.0 license is present and repository tests/private surfaces are absent;
-9. scan the exact release diff and artifacts for secrets, private identifiers, production endpoints, customer information, or unpublished CERVEL runtime semantics;
-10. update the release record with the exact selected `main` SHA only as part of the explicit release action;
-11. create the annotated/signed `v0.1.0-alpha.0` tag only after the exact commit passes the gate;
-12. create a prerelease GitHub Release from that tag only after tag verification;
-13. publish the Python package only as a separate explicit action after the GitHub release artifacts, checksums, and metadata are verified.
+7. run distribution integrity tests, offline base-wheel installation, installed-wheel smoke tests, all published examples, public schema/conformance tests, and local validation-helper tests;
+8. verify the optional validation extra installs only the declared public validation dependency and performs validation without network access;
+9. inspect both archives and verify the Apache-2.0 license is present and repository tests/private surfaces are absent;
+10. scan the exact release diff and artifacts for secrets, private identifiers, production endpoints, customer information, or unpublished CERVEL runtime semantics;
+11. update the release record with the exact selected `main` SHA only as part of the explicit release action;
+12. create the annotated/signed `v0.1.0-alpha.1` tag only after the exact commit passes the gate;
+13. create a prerelease GitHub Release from that tag only after tag verification;
+14. update the guarded PyPI publishing workflow for the new immutable candidate in a separately reviewed change before any upload;
+15. publish the Python package only as a separate explicit action after the GitHub release artifacts, checksums, and metadata are verified.
 
-No workflow in this repository currently publishes to PyPI or another package registry, and PR #21 does not create the prepared tag.
+The existing PyPI Trusted Publishing workflow remains intentionally pinned to the already-published `0.1.0a0` release until a separately reviewed release-publishing change authorizes `0.1.0a1`. Merging this candidate therefore cannot publish `0.1.0a1`.
 
 ## Rollback and correction
 

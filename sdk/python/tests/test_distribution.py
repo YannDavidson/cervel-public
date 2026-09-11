@@ -7,7 +7,7 @@ from pathlib import Path
 
 SDK_ROOT = Path(__file__).resolve().parents[1]
 DIST_DIR = SDK_ROOT / "dist"
-EXPECTED_VERSION = "0.1.0a0"
+EXPECTED_VERSION = "0.1.0a1"
 
 
 class DistributionIntegrityTests(unittest.TestCase):
@@ -21,6 +21,7 @@ class DistributionIntegrityTests(unittest.TestCase):
             names = archive.namelist()
             self.assertIn("cervel_public/__init__.py", names)
             self.assertIn("cervel_public/models.py", names)
+            self.assertIn("cervel_public/validation.py", names)
             self.assertTrue(any(name.endswith(".dist-info/licenses/LICENSE") for name in names))
             self.assertFalse(any("/tests/" in name or name.startswith("tests/") for name in names))
             self.assertFalse(any(name.startswith("schemas/") for name in names))
@@ -34,6 +35,8 @@ class DistributionIntegrityTests(unittest.TestCase):
             self.assertIn("Requires-Python: >=3.10", metadata)
             self.assertIn("License-Expression: Apache-2.0", metadata)
             self.assertIn("License-File: LICENSE", metadata)
+            self.assertIn("Provides-Extra: validation", metadata)
+            self.assertIn("jsonschema==4.25.1", metadata)
 
     def test_sdist_contains_minimal_public_release_source(self) -> None:
         sdist = next(DIST_DIR.glob("*.tar.gz"))
@@ -44,6 +47,7 @@ class DistributionIntegrityTests(unittest.TestCase):
             self.assertTrue(any(name.endswith("/LICENSE") for name in names))
             self.assertTrue(any(name.endswith("/cervel_public/__init__.py") for name in names))
             self.assertTrue(any(name.endswith("/cervel_public/models.py") for name in names))
+            self.assertTrue(any(name.endswith("/cervel_public/validation.py") for name in names))
             self.assertFalse(any("/tests/" in name for name in names))
             self.assertFalse(any("/.github/" in name for name in names))
             self.assertFalse(any("/schemas/" in name for name in names))

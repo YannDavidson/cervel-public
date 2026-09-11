@@ -77,6 +77,9 @@ jobs:
       - name: Run Python SDK source schema-conformance tests
         run: python sdk/python/tests/test_conformance.py
 
+      - name: Run Python SDK local validation-helper tests
+        run: python sdk/python/tests/test_validation.py
+
       - name: Verify frozen alpha release metadata
         run: python release/verify_candidate.py metadata
 
@@ -104,15 +107,15 @@ jobs:
       - name: Verify Python SDK distribution contents
         run: python sdk/python/tests/test_distribution.py
 
-      - name: Install built wheel without network access
+      - name: Install built base wheel without network access
         run: |
           python -m venv /tmp/cervel-sdk-venv
           /tmp/cervel-sdk-venv/bin/python -m pip install --disable-pip-version-check --no-index --no-deps sdk/python/dist/*.whl
 
-      - name: Smoke-test installed wheel outside source tree
+      - name: Smoke-test installed base wheel outside source tree
         run: cd /tmp && /tmp/cervel-sdk-venv/bin/python "$GITHUB_WORKSPACE/sdk/python/tests/smoke_installed.py"
 
-      - name: Execute every published Python example against installed wheel
+      - name: Execute every published Python example against installed base wheel
         shell: bash
         run: |
           mapfile -t examples < <(find "$GITHUB_WORKSPACE/examples/python" -maxdepth 1 -type f -name '*.py' | sort)

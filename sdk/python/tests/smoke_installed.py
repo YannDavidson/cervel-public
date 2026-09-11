@@ -3,7 +3,13 @@ from __future__ import annotations
 from pathlib import Path
 
 import cervel_public
-from cervel_public import KnowledgeReference, LookupResult, LookupResultItem
+from cervel_public import (
+    KnowledgeReference,
+    LookupResult,
+    LookupResultItem,
+    ValidationDependencyError,
+    validate_lookup_result,
+)
 
 
 module_path = Path(cervel_public.__file__).resolve()
@@ -30,3 +36,10 @@ assert payload == {
         }
     ],
 }
+
+try:
+    validate_lookup_result(payload)
+except ValidationDependencyError:
+    pass
+else:
+    raise AssertionError("base wheel unexpectedly has optional validation dependencies")
