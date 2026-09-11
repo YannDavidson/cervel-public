@@ -8,17 +8,20 @@ The repository is pre-stable. Until a stable release is declared, public contrac
 
 ### Added
 
-- Public contribution governance and automated DCO enforcement.
-- Python developer quickstart and executable public SDK examples.
-- Release-readiness policy and alpha release documentation.
-- Machine-checkable `0.1.0-alpha` release-candidate identity.
-- Deterministic double-build verification and SHA-256 candidate checksums.
+- Optional local JSON Schema validation helpers for the six deliberately published experimental contracts.
+- Generic `validate_payload()` and non-throwing `validation_errors()` helpers.
+- Specialized validators for Capture Envelope, Lookup Request, Knowledge Reference, Lookup Result, Error Envelope, and Capability Discovery.
+- Local schema access through `get_public_schema()` and `SUPPORTED_CONTRACTS`.
+- Structured validation exceptions and the optional `validation` dependency extra.
 
 ### Changed
 
-- Python release artifacts now explicitly include the Apache-2.0 license.
-- Python source distributions are intentionally minimal and exclude repository test sources.
+- Prepared the next Python prerelease candidate as `0.1.0a1` / `0.1.0-alpha.1` without modifying the published `0.1.0a0` release.
+
+## 0.1.0-alpha.1
+
+Prepared next-alpha candidate for local public-contract validation helpers. Python package version: `0.1.0a1`. Prepared tag: `v0.1.0-alpha.1`. The candidate is not published merely by merging repository changes; publication remains a separate explicit release action.
 
 ## 0.1.0-alpha
 
-Frozen release-candidate family for the first externally consumable public SDK and interoperability draft surface. Python package version: `0.1.0a0`. Prepared tag: `v0.1.0-alpha.0`. The exact tag target remains unset until the post-merge `main` SHA passes the full release gate. No package, Git tag, or GitHub Release is created merely by this changelog entry; publication requires the explicit process in `RELEASING.md`.
+First externally consumable public SDK and interoperability draft release family. Python package version: `0.1.0a0`. Published tag: `v0.1.0-alpha.0`. The published package and tag are immutable; later corrections or additions use a new prerelease serial.
