@@ -209,7 +209,11 @@ def validation_errors(contract: str, value: Any) -> tuple[str, ...]:
     payload = _payload_dict(value)
     validator = _validator(contract)
     issues: list[str] = []
-    for error in sorted(validator.iter_errors(payload), key=lambda item: list(item.absolute_path)):
+    errors = sorted(
+        validator.iter_errors(payload),
+        key=lambda item: tuple(str(part) for part in item.absolute_path),
+    )
+    for error in errors:
         path = ".".join(str(part) for part in error.absolute_path) or "$"
         issues.append(f"{path}: {error.message}")
     return tuple(issues)
