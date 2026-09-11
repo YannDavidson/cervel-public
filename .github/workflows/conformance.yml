@@ -20,6 +20,7 @@ on:
       - ".github/workflows/conformance.yml"
       - ".github/workflows/dco.yml"
       - ".github/workflows/publish-pypi.yml"
+      - ".github/workflows/pypi-install-smoke.yml"
   push:
     branches:
       - main
@@ -41,6 +42,7 @@ on:
       - ".github/workflows/conformance.yml"
       - ".github/workflows/dco.yml"
       - ".github/workflows/publish-pypi.yml"
+      - ".github/workflows/pypi-install-smoke.yml"
 
 permissions:
   contents: read
