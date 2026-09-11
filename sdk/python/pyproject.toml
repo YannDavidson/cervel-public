@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cervel-public"
-version = "0.1.0a1"
-description = "Typed convenience models and local validation helpers for CERVEL public experimental interoperability drafts."
+version = "0.1.0a2"
+description = "Public CERVEL experimental contracts, typed models, local validation, and developer sandbox."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
@@ -19,6 +19,10 @@ classifiers = [
 
 [project.optional-dependencies]
 validation = ["jsonschema==4.25.1"]
+sandbox = ["jsonschema==4.25.1"]
+
+[project.scripts]
+cervel = "cervel_public.cli:main"
 
 [project.urls]
 Homepage = "https://cervel.ai"

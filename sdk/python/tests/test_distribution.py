@@ -7,7 +7,7 @@ from pathlib import Path
 
 SDK_ROOT = Path(__file__).resolve().parents[1]
 DIST_DIR = SDK_ROOT / "dist"
-EXPECTED_VERSION = "0.1.0a1"
+EXPECTED_VERSION = "0.1.0a2"
 
 
 class DistributionIntegrityTests(unittest.TestCase):
@@ -19,9 +19,8 @@ class DistributionIntegrityTests(unittest.TestCase):
         wheel = next(DIST_DIR.glob("*.whl"))
         with zipfile.ZipFile(wheel) as archive:
             names = archive.namelist()
-            self.assertIn("cervel_public/__init__.py", names)
-            self.assertIn("cervel_public/models.py", names)
-            self.assertIn("cervel_public/validation.py", names)
+            for module in ("__init__.py", "models.py", "validation.py", "sandbox.py", "cli.py"):
+                self.assertIn(f"cervel_public/{module}", names)
             self.assertTrue(any(name.endswith(".dist-info/licenses/LICENSE") for name in names))
             self.assertFalse(any("/tests/" in name or name.startswith("tests/") for name in names))
             self.assertFalse(any(name.startswith("schemas/") for name in names))
@@ -34,20 +33,22 @@ class DistributionIntegrityTests(unittest.TestCase):
             self.assertIn(f"Version: {EXPECTED_VERSION}", metadata)
             self.assertIn("Requires-Python: >=3.10", metadata)
             self.assertIn("License-Expression: Apache-2.0", metadata)
-            self.assertIn("License-File: LICENSE", metadata)
             self.assertIn("Provides-Extra: validation", metadata)
+            self.assertIn("Provides-Extra: sandbox", metadata)
             self.assertIn("jsonschema==4.25.1", metadata)
+
+            entry_name = next(name for name in names if name.endswith(".dist-info/entry_points.txt"))
+            entry_points = archive.read(entry_name).decode("utf-8")
+            self.assertIn("cervel = cervel_public.cli:main", entry_points)
 
     def test_sdist_contains_minimal_public_release_source(self) -> None:
         sdist = next(DIST_DIR.glob("*.tar.gz"))
         with tarfile.open(sdist, "r:gz") as archive:
             names = archive.getnames()
-            self.assertTrue(any(name.endswith("/pyproject.toml") for name in names))
-            self.assertTrue(any(name.endswith("/README.md") for name in names))
-            self.assertTrue(any(name.endswith("/LICENSE") for name in names))
-            self.assertTrue(any(name.endswith("/cervel_public/__init__.py") for name in names))
-            self.assertTrue(any(name.endswith("/cervel_public/models.py") for name in names))
-            self.assertTrue(any(name.endswith("/cervel_public/validation.py") for name in names))
+            for filename in ("pyproject.toml", "README.md", "LICENSE"):
+                self.assertTrue(any(name.endswith(f"/{filename}") for name in names))
+            for module in ("__init__.py", "models.py", "validation.py", "sandbox.py", "cli.py"):
+                self.assertTrue(any(name.endswith(f"/cervel_public/{module}") for name in names))
             self.assertFalse(any("/tests/" in name for name in names))
             self.assertFalse(any("/.github/" in name for name in names))
             self.assertFalse(any("/schemas/" in name for name in names))

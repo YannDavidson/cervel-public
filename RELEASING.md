@@ -4,59 +4,54 @@ CERVEL Public uses a deliberate release gate. Merging release-readiness changes 
 
 ## Versioning
 
-The public repository uses semantic release labels for human-facing release communication and PEP 440 versions for the Python distribution.
+Published public alphas:
 
-Published first alpha:
-
-- public release label: `0.1.0-alpha`;
-- Python package version: `0.1.0a0`;
-- published tag: `v0.1.0-alpha.0`.
+- `0.1.0-alpha` / Python `0.1.0a0` / tag `v0.1.0-alpha.0`;
+- `0.1.0-alpha.1` / Python `0.1.0a1` / tag `v0.1.0-alpha.1`.
 
 Current prepared candidate:
 
-- public release label: `0.1.0-alpha.1`;
-- Python package version: `0.1.0a1`;
-- prepared tag: `v0.1.0-alpha.1`.
+- public release label: `0.1.0-alpha.2`;
+- Python package version: `0.1.0a2`;
+- prepared tag: `v0.1.0-alpha.2`.
 
-The machine-checkable current candidate identity is recorded in `release/alpha-0.1.0-a1.json`. Until an explicit release action selects the exact post-merge `main` commit, `tag_target_sha` must remain `null` and the manifest status must remain `prepared-not-published`.
+The machine-checkable current candidate identity is recorded in `release/alpha-0.1.0-a2.json`. Until an explicit release action selects the exact post-merge `main` commit, `tag_target_sha` must remain `null` and the manifest status must remain `prepared-not-published`.
 
-Published versions and tags are immutable. The prior `0.1.0a0` / `v0.1.0-alpha.0` release remains unchanged while the next candidate advances independently.
+Published versions and tags are immutable. New functionality always advances the prerelease serial rather than replacing an existing artifact.
 
 ## Release artifact policy
 
-The Python wheel and source distribution are public SDK artifacts, not repository mirrors. They must contain only the public SDK package, required packaging metadata and documentation, and the Apache-2.0 license. Repository test sources, schemas, conformance fixtures, workflows, private implementation material, credentials, and unrelated repository content must not be included.
+The Python wheel and source distribution are public developer artifacts, not repository mirrors. They may contain only the deliberately public SDK package, the bounded local developer sandbox, required packaging metadata/documentation, and the Apache-2.0 license. Repository test sources, schemas, conformance fixtures, workflows, private implementation material, credentials, and unrelated repository content must not be included.
 
 Tests remain in the repository and CI because they validate the artifact boundary before release; they are intentionally excluded from the published sdist and wheel.
 
 ## Reproducibility and checksums
 
-The release-candidate CI builds the wheel and sdist twice from the same checked-out source using the pinned build toolchain, `PYTHONHASHSEED=0`, and a fixed `SOURCE_DATE_EPOCH`. The wheel is compared directly. Because setuptools' gzip/tar container metadata is not itself stable across otherwise identical sdist builds, each sdist is canonicalized before comparison by fixing gzip/tar timestamps and ownership metadata and sorting archive members. File contents, names, modes, links, and release payload remain subject to exact comparison.
+The release-candidate CI builds the wheel and sdist twice from the same checked-out source using the pinned build toolchain, `PYTHONHASHSEED=0`, and a fixed `SOURCE_DATE_EPOCH`. The wheel is compared directly. Each sdist is canonicalized before comparison by fixing gzip/tar timestamps and ownership metadata and sorting archive members.
 
-After canonicalization, the wheel and sdist pairs must be byte-for-byte identical before they are accepted as a candidate. The accepted candidate is then staged and CI generates `sdk/python/dist/SHA256SUMS` containing SHA-256 digests for the exact wheel and canonical sdist.
-
-Checksums are evidence for the candidate produced by that exact run; they are not a substitute for selecting and recording the final release commit SHA.
+After canonicalization, the wheel and sdist pairs must be byte-for-byte identical. CI stages the accepted candidate and generates `sdk/python/dist/SHA256SUMS` for the exact wheel and canonical sdist.
 
 ## Alpha release gate
 
-Before any external publication of the current candidate:
+Before external publication of `0.1.0-alpha.2` / `0.1.0a2` / `v0.1.0-alpha.2`:
 
-1. select the exact post-merge `main` commit intended for release and record its SHA;
-2. confirm the `DCO sign-off` and Public conformance checks are successful on the release-preparation PR;
-3. verify `release/alpha-0.1.0-a1.json`, `pyproject.toml`, `CHANGELOG.md`, release notes, and this document agree on `0.1.0-alpha.1`, `0.1.0a1`, and `v0.1.0-alpha.1`;
-4. build wheel and sdist twice from the exact release source with the pinned build tooling and deterministic build environment;
-5. canonicalize only the sdist container metadata and require both candidate pairs to be byte-for-byte identical;
-6. generate and inspect SHA-256 checksums for the accepted wheel and canonical sdist;
-7. run distribution integrity tests, offline base-wheel installation, installed-wheel smoke tests, all published examples, public schema/conformance tests, and local validation-helper tests;
-8. verify the optional validation extra installs only the declared public validation dependency and performs validation without network access;
-9. inspect both archives and verify the Apache-2.0 license is present and repository tests/private surfaces are absent;
-10. scan the exact release diff and artifacts for secrets, private identifiers, production endpoints, customer information, or unpublished CERVEL runtime semantics;
-11. update the release record with the exact selected `main` SHA only as part of the explicit release action;
-12. create the annotated/signed `v0.1.0-alpha.1` tag only after the exact commit passes the gate;
-13. create a prerelease GitHub Release from that tag only after tag verification;
-14. update the guarded PyPI publishing workflow for the new immutable candidate in a separately reviewed change before any upload;
-15. publish the Python package only as a separate explicit action after the GitHub release artifacts, checksums, and metadata are verified.
-
-The existing PyPI Trusted Publishing workflow remains intentionally pinned to the already-published `0.1.0a0` release until a separately reviewed release-publishing change authorizes `0.1.0a1`. Merging this candidate therefore cannot publish `0.1.0a1`.
+1. select the exact post-merge protected `main` commit intended for release;
+2. require successful `DCO sign-off` and Public conformance on the release-preparation PR;
+3. verify the release manifest, `pyproject.toml`, changelog, release notes, and this document agree on the exact version identity;
+4. run all public schema fixtures, SDK model tests, local validation-helper tests, and sandbox unit/HTTP integration tests;
+5. build wheel and sdist twice with pinned tooling and deterministic build settings;
+6. canonicalize only sdist container metadata and require byte-for-byte reproducibility;
+7. generate and inspect SHA-256 checksums;
+8. verify distribution contents, license, console-script metadata, optional extras, and exclusion of tests/private surfaces;
+9. install the base wheel offline and verify imports plus `cervel --help` and `cervel dev --help` work outside the source tree;
+10. install the sandbox extra in a fresh environment and run an actual localhost capture→lookup→capability flow;
+11. verify the sandbox binds only to loopback by default, stores data only in memory, and does not contact a remote CERVEL service;
+12. scan source, artifacts, and logs for secrets, production endpoints, customer information, private identifiers, or unpublished runtime semantics;
+13. create the exact release tag only after the frozen commit passes the gate;
+14. create a GitHub prerelease and verify exact asset hashes;
+15. update the guarded PyPI Trusted Publishing workflow in a separate reviewed change;
+16. publish through PyPI Trusted Publishing only after all prior checks pass;
+17. verify `cervel-public[sandbox]==0.1.0a2` from PyPI in a fresh environment.
 
 ## Rollback and correction
 
