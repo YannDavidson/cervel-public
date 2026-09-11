@@ -1,17 +1,17 @@
 # CERVEL Public Python SDK — 5-Minute Quickstart
 
-This quickstart demonstrates the experimental public `0.1-draft` SDK as a local, typed representation of the published CERVEL interoperability contracts.
+This quickstart demonstrates the experimental public `0.1-draft` SDK as a typed representation of the published CERVEL interoperability contracts.
 
 > The public JSON Schemas remain authoritative. These examples do not connect to a CERVEL service and do not describe production capture, retrieval, authorization, ranking, persistence, provenance, or other private runtime behavior.
 
-## 1. Install the local SDK
+## 1. Install the published alpha
 
-From a clone of this repository:
+Create a fresh virtual environment and install the exact public alpha from PyPI:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install ./sdk/python
+python -m pip install cervel-public==0.1.0a0
 ```
 
 The package has no runtime dependencies.
@@ -32,7 +32,7 @@ print(capture.to_dict())
 
 This creates JSON-compatible data matching the published Capture Envelope draft. It does not submit or persist anything.
 
-Run the repository example:
+If you cloned this repository, you can run the corresponding example against the installed package:
 
 ```bash
 python examples/python/01_capture.py
@@ -108,4 +108,4 @@ Lookup Result → Knowledge Reference
 
 The examples exercise only the public SDK objects already defined by the repository schemas. They contain no HTTP requests, credentials, endpoint URLs, service discovery, authentication, authorization, persistence, ranking, knowledge compilation, provenance engine, agent runtime, synchronization, model routing, or production compatibility claims.
 
-CI executes every Python file published under `examples/python/` against the built and installed wheel so examples cannot silently drift from the installable SDK.
+CI verifies both release paths: repository conformance installs the built wheel offline, while the PyPI installation smoke workflow creates a fresh environment, installs `cervel-public==0.1.0a0` from PyPI, confirms the import does not resolve from the repository checkout, and executes every Python file under `examples/python/` against that registry-installed package.

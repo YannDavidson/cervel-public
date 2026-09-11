@@ -1,0 +1,71 @@
+name: PyPI install smoke
+
+on:
+  pull_request:
+    paths:
+      - "README.md"
+      - "docs/python-quickstart.md"
+      - "examples/python/**"
+      - ".github/workflows/pypi-install-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-pypi-install:
+    name: Install published SDK from PyPI and run public examples
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository examples
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Create clean verification environment
+        run: python -m venv /tmp/cervel-pypi-venv
+
+      - name: Install exact published package from PyPI
+        run: |
+          /tmp/cervel-pypi-venv/bin/python -m pip install \
+            --disable-pip-version-check \
+            --no-cache-dir \
+            --index-url https://pypi.org/simple \
+            cervel-public==0.1.0a0
+
+      - name: Verify package identity and import location
+        shell: bash
+        run: |
+          cd /tmp
+          /tmp/cervel-pypi-venv/bin/python - <<'PY'
+          import importlib.metadata
+          import pathlib
+          import cervel_public
+
+          version = importlib.metadata.version("cervel-public")
+          module_path = pathlib.Path(cervel_public.__file__).resolve()
+          workspace = pathlib.Path("${{ github.workspace }}").resolve()
+
+          assert version == "0.1.0a0", version
+          assert workspace not in module_path.parents, module_path
+          print(f"Verified cervel-public {version}")
+          print(f"Imported from {module_path}")
+          PY
+
+      - name: Run every public example against PyPI-installed package
+        shell: bash
+        run: |
+          mapfile -t examples < <(find "$GITHUB_WORKSPACE/examples/python" -maxdepth 1 -type f -name '*.py' | sort)
+          test "${#examples[@]}" -gt 0
+          cd /tmp
+          for example in "${examples[@]}"; do
+            echo "Running ${example#$GITHUB_WORKSPACE/}"
+            /tmp/cervel-pypi-venv/bin/python "$example"
+          done

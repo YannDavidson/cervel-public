@@ -8,9 +8,37 @@ This repository is the deliberately reviewed public home for CERVEL developer-fa
 
 CERVEL is built around a simple idea: durable knowledge should remain useful even as models, applications, and interfaces change.
 
+## Python SDK quickstart
+
+Install the current public alpha from PyPI into a fresh environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install cervel-public==0.1.0a0
+```
+
+Then use the typed public SDK:
+
+```python
+from cervel_public import CaptureEnvelope
+
+capture = CaptureEnvelope(
+    content="The design review is scheduled for Friday.",
+    content_type="text/plain",
+    title="Synthetic project note",
+)
+
+print(capture.to_dict())
+```
+
+The package is a public convenience SDK for the published experimental contracts. It does not connect to or expose CERVEL's non-public runtime, retrieval, authorization, persistence, provenance, routing, or orchestration systems.
+
+See `docs/python-quickstart.md` for the full synthetic example flow.
+
 ## Start here
 
-- `docs/python-quickstart.md` — five-minute Python quickstart using only the experimental public SDK and synthetic local examples.
+- `docs/python-quickstart.md` — five-minute Python quickstart using the published alpha package and synthetic local examples.
 - `docs/CONCEPTS.md` — public vocabulary for persistent knowledge, identity, source context, access, embodiments, capture, provenance, and traceability.
 - `docs/ARCHITECTURE.md` — deliberately high-level public architecture.
 - `docs/TRUST_PRINCIPLES.md` — security and trust expectations for public interfaces.
@@ -26,7 +54,7 @@ CERVEL is built around a simple idea: durable knowledge should remain useful eve
 
 CERVEL is in active development. Public material may evolve before stable releases.
 
-The current Python SDK package metadata is `0.1.0a0`, corresponding to the first `0.1.0-alpha` release family. No package registry publication or GitHub Release is implied by the repository version alone; releases follow the explicit gate in `RELEASING.md`.
+The current public Python SDK release is `cervel-public==0.1.0a0`, corresponding to the first `0.1.0-alpha` release family. It is published on PyPI through GitHub OIDC Trusted Publishing from the controlled release workflow.
 
 This repository is **not** a mirror of non-public CERVEL source or infrastructure. Only material explicitly published here should be treated as part of the public CERVEL surface.
 
