@@ -8,19 +8,20 @@ The repository is pre-stable. Until a stable release is declared, public contrac
 
 ### Added
 
-- Optional local JSON Schema validation helpers for the six deliberately published experimental contracts.
-- Generic `validate_payload()` and non-throwing `validation_errors()` helpers.
-- Specialized validators for Capture Envelope, Lookup Request, Knowledge Reference, Lookup Result, Error Envelope, and Capability Discovery.
-- Local schema access through `get_public_schema()` and `SUPPORTED_CONTRACTS`.
-- Structured validation exceptions and the optional `validation` dependency extra.
+- CERVEL Local Developer Sandbox with a `cervel dev` CLI.
+- Loopback-only `GET /capabilities`, `POST /capture`, and `POST /lookup` endpoints.
+- Ephemeral in-memory capture records and deterministic public token-overlap lookup behavior.
+- Contract validation for sandbox requests and generated public responses.
+- HTTP integration tests, installed-wheel CLI checks, and local sandbox documentation.
+- Optional `sandbox` dependency extra.
 
 ### Changed
 
-- Prepared the next Python prerelease candidate as `0.1.0a1` / `0.1.0-alpha.1` without modifying the published `0.1.0a0` release.
+- Prepared the next Python prerelease candidate as `0.1.0a2` / `0.1.0-alpha.2` without modifying the published `0.1.0a1` release.
 
 ## 0.1.0-alpha.1
 
-Prepared next-alpha candidate for local public-contract validation helpers. Python package version: `0.1.0a1`. Prepared tag: `v0.1.0-alpha.1`. The candidate is not published merely by merging repository changes; publication remains a separate explicit release action.
+Published as Python package version `0.1.0a1` with tag `v0.1.0-alpha.1`. Added optional purely local JSON Schema validation helpers for the six deliberately published experimental contracts, structured validation errors, local schema access, and the `validation` extra.
 
 ## 0.1.0-alpha
 

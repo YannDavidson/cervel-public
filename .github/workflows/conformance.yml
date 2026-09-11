@@ -11,6 +11,7 @@ on:
       - "release/**"
       - "docs/python-quickstart.md"
       - "docs/python-sdk-api-reference.md"
+      - "docs/local-developer-sandbox.md"
       - "docs/releases/**"
       - "CHANGELOG.md"
       - "RELEASING.md"
@@ -34,6 +35,7 @@ on:
       - "release/**"
       - "docs/python-quickstart.md"
       - "docs/python-sdk-api-reference.md"
+      - "docs/local-developer-sandbox.md"
       - "docs/releases/**"
       - "CHANGELOG.md"
       - "RELEASING.md"
@@ -80,6 +82,9 @@ jobs:
       - name: Run Python SDK local validation-helper tests
         run: python sdk/python/tests/test_validation.py
 
+      - name: Run local developer sandbox tests
+        run: python sdk/python/tests/test_sandbox.py
+
       - name: Verify frozen alpha release metadata
         run: python release/verify_candidate.py metadata
 
@@ -112,8 +117,12 @@ jobs:
           python -m venv /tmp/cervel-sdk-venv
           /tmp/cervel-sdk-venv/bin/python -m pip install --disable-pip-version-check --no-index --no-deps sdk/python/dist/*.whl
 
-      - name: Smoke-test installed base wheel outside source tree
-        run: cd /tmp && /tmp/cervel-sdk-venv/bin/python "$GITHUB_WORKSPACE/sdk/python/tests/smoke_installed.py"
+      - name: Smoke-test installed base wheel and CLI outside source tree
+        run: |
+          cd /tmp
+          /tmp/cervel-sdk-venv/bin/python "$GITHUB_WORKSPACE/sdk/python/tests/smoke_installed.py"
+          /tmp/cervel-sdk-venv/bin/cervel --help
+          /tmp/cervel-sdk-venv/bin/cervel dev --help
 
       - name: Execute every published Python example against installed base wheel
         shell: bash

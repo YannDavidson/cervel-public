@@ -10,44 +10,63 @@ CERVEL is built around a simple idea: durable knowledge should remain useful eve
 
 ## Python SDK quickstart
 
-Install the current public alpha from PyPI into a fresh environment:
+Install the current published public alpha from PyPI:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install cervel-public==0.1.0a0
+python -m pip install 'cervel-public[validation]==0.1.0a1'
 ```
 
-Then use the typed public SDK:
+Then use the typed public SDK and local contract validation:
 
 ```python
-from cervel_public import CaptureEnvelope
+from cervel_public import CaptureEnvelope, validate_capture_envelope
 
 capture = CaptureEnvelope(
     content="The design review is scheduled for Friday.",
     content_type="text/plain",
     title="Synthetic project note",
 )
-
+validate_capture_envelope(capture)
 print(capture.to_dict())
 ```
 
-The package is a public convenience SDK for the published experimental contracts. It does not connect to or expose CERVEL's non-public runtime, retrieval, authorization, persistence, provenance, routing, or orchestration systems.
+## Local developer sandbox
 
-See `docs/python-quickstart.md` for the full synthetic example flow and `docs/python-sdk-api-reference.md` for the complete public Python API reference.
+The next prepared candidate adds a real localhost-only compatibility target without exposing the proprietary CERVEL engine. From a repository checkout:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e './sdk/python[sandbox]'
+cervel dev
+```
+
+The sandbox starts at `http://127.0.0.1:8765` and exposes:
+
+```text
+GET  /capabilities
+POST /capture
+POST /lookup
+```
+
+It validates public-contract traffic, stores records only in process memory, and uses deliberately simple public lookup behavior that is unrelated to CERVEL's private retrieval/ranking systems. See `docs/local-developer-sandbox.md`.
+
+The package and sandbox do not expose CERVEL's non-public authorization, permission-aware activation, persistence, provenance processing, knowledge compilation, production retrieval/ranking, routing, orchestration, or private storage systems.
 
 ## Start here
 
-- `docs/python-quickstart.md` — five-minute Python quickstart using the published alpha package and synthetic local examples.
-- `docs/python-sdk-api-reference.md` — public Python API reference, field signatures, serialization behavior, capability discovery, and public/private boundary.
-- `docs/CONCEPTS.md` — public vocabulary for persistent knowledge, identity, source context, access, embodiments, capture, provenance, and traceability.
+- `docs/python-quickstart.md` — five-minute Python quickstart.
+- `docs/python-sdk-api-reference.md` — complete public Python API reference.
+- `docs/local-developer-sandbox.md` — clone, run, and build against the bounded localhost sandbox.
+- `docs/CONCEPTS.md` — public vocabulary for persistent knowledge and traceability.
 - `docs/ARCHITECTURE.md` — deliberately high-level public architecture.
 - `docs/TRUST_PRINCIPLES.md` — security and trust expectations for public interfaces.
-- `docs/SPECIFICATION_MODEL.md` — how concepts, draft specifications, and stable public contracts are separated.
-- `docs/PUBLIC_PRIVATE_BOUNDARY.md` — the publication and disclosure boundary.
+- `docs/SPECIFICATION_MODEL.md` — separation of concepts, drafts, and stable public contracts.
+- `docs/PUBLIC_PRIVATE_BOUNDARY.md` — publication and disclosure boundary.
 - `CONTRIBUTING.md` — contribution workflow, sign-off, licensing, and disclosure requirements.
 - `GOVERNANCE.md` — maintainer decision boundary and public-repository governance.
-- `CODE_OF_CONDUCT.md` — participation expectations.
 - `RELEASING.md` — controlled alpha release gate and artifact policy.
 - `CHANGELOG.md` — public change history and release family status.
 
@@ -55,7 +74,7 @@ See `docs/python-quickstart.md` for the full synthetic example flow and `docs/py
 
 CERVEL is in active development. Public material may evolve before stable releases.
 
-The current public Python SDK release is `cervel-public==0.1.0a0`, corresponding to the first `0.1.0-alpha` release family. It is published on PyPI through GitHub OIDC Trusted Publishing from the controlled release workflow.
+The current published Python SDK release is `cervel-public==0.1.0a1`. The repository is preparing `0.1.0a2`, which adds the bounded local developer sandbox; it is not published merely by merging source changes.
 
 This repository is **not** a mirror of non-public CERVEL source or infrastructure. Only material explicitly published here should be treated as part of the public CERVEL surface.
 
@@ -65,7 +84,7 @@ This repository is **not** a mirror of non-public CERVEL source or infrastructur
 docs/        Public concepts, release notes, and documentation
 protocols/   Approved interoperability contracts
 schemas/     Approved public schemas
-sdk/         Developer tooling for published interfaces
+sdk/         Developer tooling and bounded public sandbox
 examples/    Public-safe examples
 governance/  Public contribution-governance validation tooling
 ```
@@ -82,7 +101,7 @@ Public concepts are informative. Normative interoperability behavior exists only
 
 Material published in this repository is licensed under the Apache License, Version 2.0 unless a more specific notice states otherwise. See `LICENSE` and `LICENSING.md`.
 
-The Python wheel and source distribution also carry the Apache-2.0 license as part of the release artifact. The license applies only to material actually distributed in this public repository or package; it does not imply publication or licensing of non-public CERVEL technology.
+The Python wheel and source distribution also carry the Apache-2.0 license. The license applies only to material actually distributed in this public repository or package; it does not imply publication or licensing of non-public CERVEL technology.
 
 ## Security
 
