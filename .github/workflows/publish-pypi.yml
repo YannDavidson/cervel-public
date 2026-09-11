@@ -9,7 +9,7 @@ on:
         type: choice
         options:
           - do-not-publish
-          - publish-v0.1.0-alpha.0
+          - publish-v0.1.0-alpha.1
         default: do-not-publish
 
 permissions:
@@ -18,7 +18,7 @@ permissions:
 jobs:
   publish:
     name: Publish frozen alpha candidate to PyPI
-    if: ${{ inputs.confirmation == 'publish-v0.1.0-alpha.0' }}
+    if: ${{ inputs.confirmation == 'publish-v0.1.0-alpha.1' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: pypi
@@ -30,7 +30,7 @@ jobs:
       - name: Check out exact release tag
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: v0.1.0-alpha.0
+          ref: v0.1.0-alpha.1
           fetch-depth: 1
           persist-credentials: false
 
@@ -38,7 +38,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          expected="c79ed8b89e346dc89077fecdc7030a9d4897e73d"
+          expected="950485941d875528838473d79ec3278bebb61ffe"
           actual="$(git rev-parse HEAD)"
           test "$actual" = "$expected"
           echo "Verified release commit: $actual"
@@ -51,10 +51,10 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/cervel-release /tmp/pypi-dist
           mkdir -p /tmp/cervel-release /tmp/pypi-dist
-          gh release download v0.1.0-alpha.0 \
+          gh release download v0.1.0-alpha.1 \
             --repo "${GITHUB_REPOSITORY}" \
-            --pattern 'cervel_public-0.1.0a0-py3-none-any.whl' \
-            --pattern 'cervel_public-0.1.0a0.tar.gz' \
+            --pattern 'cervel_public-0.1.0a1-py3-none-any.whl' \
+            --pattern 'cervel_public-0.1.0a1.tar.gz' \
             --pattern 'SHA256SUMS' \
             --dir /tmp/cervel-release
           test "$(find /tmp/cervel-release -maxdepth 1 -type f | wc -l | tr -d ' ')" = "3"
@@ -64,14 +64,14 @@ jobs:
         run: |
           set -euo pipefail
           cat > /tmp/EXPECTED_SHA256SUMS <<'EOF'
-          9ec8e835977a0b0d736a614399bfc1985aefb40d1033ba08f8058327a3a2cbf8  cervel_public-0.1.0a0-py3-none-any.whl
-          3c3325c12d5a42dce5d8e81690e8767926272bc10c770c1c9934fe6464c750d2  cervel_public-0.1.0a0.tar.gz
+          f08c96d627c6b91aac7ee14a8ae2d62d5a0f3b52890a57dc74430c38c5576d5d  cervel_public-0.1.0a1-py3-none-any.whl
+          e851c5f045fa0b2460b4728aa9e05cf0aadd715a2c110d5efa4dad30ecf41ad3  cervel_public-0.1.0a1.tar.gz
           EOF
           cmp /tmp/EXPECTED_SHA256SUMS /tmp/cervel-release/SHA256SUMS
           cd /tmp/cervel-release
           sha256sum -c SHA256SUMS
-          cp cervel_public-0.1.0a0-py3-none-any.whl /tmp/pypi-dist/
-          cp cervel_public-0.1.0a0.tar.gz /tmp/pypi-dist/
+          cp cervel_public-0.1.0a1-py3-none-any.whl /tmp/pypi-dist/
+          cp cervel_public-0.1.0a1.tar.gz /tmp/pypi-dist/
           test "$(find /tmp/pypi-dist -maxdepth 1 -type f | wc -l | tr -d ' ')" = "2"
 
       - name: Verify distribution boundary
