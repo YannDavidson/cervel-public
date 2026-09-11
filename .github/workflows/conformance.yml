@@ -124,6 +124,14 @@ jobs:
           /tmp/cervel-sdk-venv/bin/cervel --help
           /tmp/cervel-sdk-venv/bin/cervel dev --help
 
+      - name: Install and exercise built sandbox wheel in a fresh environment
+        run: |
+          python -m venv /tmp/cervel-sandbox-venv
+          /tmp/cervel-sandbox-venv/bin/python -m pip install --disable-pip-version-check --no-deps sdk/python/dist/*.whl
+          /tmp/cervel-sandbox-venv/bin/python -m pip install --disable-pip-version-check jsonschema==4.25.1
+          cd /tmp
+          /tmp/cervel-sandbox-venv/bin/python "$GITHUB_WORKSPACE/sdk/python/tests/smoke_sandbox_installed.py"
+
       - name: Execute every published Python example against installed base wheel
         shell: bash
         run: |
