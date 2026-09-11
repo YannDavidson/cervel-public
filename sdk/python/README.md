@@ -17,7 +17,7 @@ Included models:
 
 Each model exposes `to_dict()` for JSON-compatible serialization.
 
-The next alpha candidate also includes optional, purely local contract-validation helpers:
+The prepared `0.1.0a1` candidate also includes optional, purely local contract-validation helpers:
 
 - `validate_payload(contract, value)`
 - `validate_capture_envelope()`
@@ -29,11 +29,13 @@ The next alpha candidate also includes optional, purely local contract-validatio
 - `validation_errors()`
 - `get_public_schema()`
 
-The base SDK remains dependency-free. Validation requires the optional extra:
+The base SDK remains dependency-free. Once `0.1.0a1` is explicitly published, validation will be installed with the optional extra:
 
 ```bash
-python -m pip install 'cervel-public[validation]'
+python -m pip install 'cervel-public[validation]==0.1.0a1'
 ```
+
+Until then, the published PyPI release remains `0.1.0a0` and does not contain these helpers.
 
 The validation extra uses the same public JSON Schema engine used by repository conformance. Validation is local only; it performs no network requests.
 
