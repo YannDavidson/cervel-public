@@ -34,11 +34,12 @@ print(capture.to_dict())
 
 The package is a public convenience SDK for the published experimental contracts. It does not connect to or expose CERVEL's non-public runtime, retrieval, authorization, persistence, provenance, routing, or orchestration systems.
 
-See `docs/python-quickstart.md` for the full synthetic example flow.
+See `docs/python-quickstart.md` for the full synthetic example flow and `docs/python-sdk-api-reference.md` for the complete public Python API reference.
 
 ## Start here
 
 - `docs/python-quickstart.md` — five-minute Python quickstart using the published alpha package and synthetic local examples.
+- `docs/python-sdk-api-reference.md` — public Python API reference, field signatures, serialization behavior, capability discovery, and public/private boundary.
 - `docs/CONCEPTS.md` — public vocabulary for persistent knowledge, identity, source context, access, embodiments, capture, provenance, and traceability.
 - `docs/ARCHITECTURE.md` — deliberately high-level public architecture.
 - `docs/TRUST_PRINCIPLES.md` — security and trust expectations for public interfaces.
