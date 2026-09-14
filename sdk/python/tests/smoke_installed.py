@@ -4,6 +4,7 @@ from pathlib import Path
 
 import cervel_public
 from cervel_public import (
+    LocalClient,
     KnowledgeReference,
     LookupResult,
     LookupResultItem,
@@ -14,6 +15,9 @@ from cervel_public import (
 
 module_path = Path(cervel_public.__file__).resolve()
 assert "site-packages" in module_path.parts, module_path
+
+client = LocalClient()
+assert client.base_url == "http://127.0.0.1:8765"
 
 payload = LookupResult(
     items=(

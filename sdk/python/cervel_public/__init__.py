@@ -1,5 +1,14 @@
 """Public Python helpers for CERVEL experimental interoperability drafts."""
 
+from .client import (
+    DEFAULT_LOCAL_BASE_URL,
+    LocalClient,
+    LocalClientConfigurationError,
+    LocalClientConnectionError,
+    LocalClientError,
+    LocalClientMalformedResponseError,
+    LocalClientResponseError,
+)
 from .models import (
     PUBLIC_DRAFT_VERSION,
     CapabilityContract,
@@ -28,6 +37,7 @@ from .validation import (
 )
 
 __all__ = [
+    "DEFAULT_LOCAL_BASE_URL",
     "PUBLIC_DRAFT_VERSION",
     "SUPPORTED_CONTRACTS",
     "CapabilityContract",
@@ -36,6 +46,12 @@ __all__ = [
     "ContractValidationError",
     "ErrorEnvelope",
     "KnowledgeReference",
+    "LocalClient",
+    "LocalClientConfigurationError",
+    "LocalClientConnectionError",
+    "LocalClientError",
+    "LocalClientMalformedResponseError",
+    "LocalClientResponseError",
     "LookupRequest",
     "LookupResult",
     "LookupResultItem",

@@ -19,7 +19,14 @@ class DistributionIntegrityTests(unittest.TestCase):
         wheel = next(DIST_DIR.glob("*.whl"))
         with zipfile.ZipFile(wheel) as archive:
             names = archive.namelist()
-            for module in ("__init__.py", "models.py", "validation.py", "sandbox.py", "cli.py"):
+            for module in (
+                "__init__.py",
+                "models.py",
+                "validation.py",
+                "sandbox.py",
+                "client.py",
+                "cli.py",
+            ):
                 self.assertIn(f"cervel_public/{module}", names)
             self.assertTrue(any(name.endswith(".dist-info/licenses/LICENSE") for name in names))
             self.assertFalse(any("/tests/" in name or name.startswith("tests/") for name in names))
@@ -47,7 +54,14 @@ class DistributionIntegrityTests(unittest.TestCase):
             names = archive.getnames()
             for filename in ("pyproject.toml", "README.md", "LICENSE"):
                 self.assertTrue(any(name.endswith(f"/{filename}") for name in names))
-            for module in ("__init__.py", "models.py", "validation.py", "sandbox.py", "cli.py"):
+            for module in (
+                "__init__.py",
+                "models.py",
+                "validation.py",
+                "sandbox.py",
+                "client.py",
+                "cli.py",
+            ):
                 self.assertTrue(any(name.endswith(f"/cervel_public/{module}") for name in names))
             self.assertFalse(any("/tests/" in name for name in names))
             self.assertFalse(any("/.github/" in name for name in names))
