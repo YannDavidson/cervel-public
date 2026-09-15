@@ -7,7 +7,7 @@ from pathlib import Path
 
 SDK_ROOT = Path(__file__).resolve().parents[1]
 DIST_DIR = SDK_ROOT / "dist"
-EXPECTED_VERSION = "0.1.0a2"
+EXPECTED_VERSION = "0.1.0a3"
 
 
 class DistributionIntegrityTests(unittest.TestCase):
