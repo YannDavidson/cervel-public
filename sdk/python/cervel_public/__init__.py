@@ -11,6 +11,7 @@ from .client import (
 )
 from .model_adapters import (
     ModelAdapter,
+    ModelAdapterConfigurationError,
     ModelAdapterConnectionError,
     ModelAdapterError,
     ModelAdapterResponseError,
@@ -18,6 +19,7 @@ from .model_adapters import (
     ModelRequest,
     ModelResponse,
     OllamaAdapter,
+    OpenAICompatibleAdapter,
     build_prompt,
     context_from_lookup,
     render_context,
@@ -55,10 +57,10 @@ __all__ = [
     "ErrorEnvelope", "KnowledgeReference", "LocalClient", "LocalClientConfigurationError",
     "LocalClientConnectionError", "LocalClientError", "LocalClientMalformedResponseError",
     "LocalClientResponseError", "LookupRequest", "LookupResult", "LookupResultItem",
-    "ModelAdapter", "ModelAdapterConnectionError", "ModelAdapterError", "ModelAdapterResponseError",
-    "ModelContextItem", "ModelRequest", "ModelResponse", "OllamaAdapter", "UnsupportedContractError",
-    "ValidationDependencyError", "build_prompt", "context_from_lookup", "get_public_schema",
-    "render_context", "validate_capability_discovery", "validate_capture_envelope",
-    "validate_error_envelope", "validate_knowledge_reference", "validate_lookup_request",
-    "validate_lookup_result", "validate_payload", "validation_errors",
+    "ModelAdapter", "ModelAdapterConfigurationError", "ModelAdapterConnectionError", "ModelAdapterError",
+    "ModelAdapterResponseError", "ModelContextItem", "ModelRequest", "ModelResponse", "OllamaAdapter",
+    "OpenAICompatibleAdapter", "UnsupportedContractError", "ValidationDependencyError", "build_prompt",
+    "context_from_lookup", "get_public_schema", "render_context", "validate_capability_discovery",
+    "validate_capture_envelope", "validate_error_envelope", "validate_knowledge_reference",
+    "validate_lookup_request", "validate_lookup_result", "validate_payload", "validation_errors",
 ]

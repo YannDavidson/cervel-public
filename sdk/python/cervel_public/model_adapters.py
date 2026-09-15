@@ -9,13 +9,19 @@ Intelligence Gateway.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from typing import Protocol, Sequence
 from urllib import error, request
+from urllib.parse import urlparse
 
 
 class ModelAdapterError(RuntimeError):
     """Base error for public developer model adapters."""
+
+
+class ModelAdapterConfigurationError(ModelAdapterError):
+    """Raised when developer-owned model configuration is invalid."""
 
 
 class ModelAdapterConnectionError(ModelAdapterError):
@@ -115,6 +121,63 @@ class OllamaAdapter:
         return ModelResponse(text=text, model=self.model_id)
 
 
+class OpenAICompatibleAdapter:
+    """Developer-owned adapter for OpenAI-compatible chat-completions endpoints."""
+
+    def __init__(
+        self,
+        model: str,
+        *,
+        api_key: str | None = None,
+        api_key_env: str = "OPENAI_API_KEY",
+        base_url: str = "https://api.openai.com/v1",
+        timeout: float = 60.0,
+    ) -> None:
+        if not model.strip():
+            raise ModelAdapterConfigurationError("model must not be empty")
+        parsed = urlparse(base_url)
+        if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password or parsed.query or parsed.fragment:
+            raise ModelAdapterConfigurationError("cloud model base_url must be an HTTPS origin/path without credentials, query, or fragment")
+        key = api_key if api_key is not None else os.environ.get(api_key_env)
+        if not key or not key.strip():
+            raise ModelAdapterConfigurationError(f"missing developer-owned API key in {api_key_env}")
+        self._model = model.strip()
+        self._api_key = key.strip()
+        self._base_url = base_url.rstrip("/")
+        self._timeout = timeout
+
+    @property
+    def model_id(self) -> str:
+        return f"openai:{self._model}"
+
+    def generate(self, value: ModelRequest) -> ModelResponse:
+        payload = json.dumps(
+            {"model": self._model, "messages": [{"role": "user", "content": build_prompt(value)}]}
+        ).encode("utf-8")
+        req = request.Request(
+            f"{self._base_url}/chat/completions",
+            data=payload,
+            headers={"Authorization": f"Bearer {self._api_key}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with request.urlopen(req, timeout=self._timeout) as response:
+                decoded = json.loads(response.read().decode("utf-8"))
+        except error.HTTPError as exc:
+            raise ModelAdapterResponseError(f"cloud model endpoint returned HTTP {exc.code}") from exc
+        except (error.URLError, OSError) as exc:
+            raise ModelAdapterConnectionError("could not reach configured cloud model endpoint") from exc
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise ModelAdapterResponseError("cloud model endpoint returned malformed JSON") from exc
+        try:
+            text = decoded["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError) as exc:
+            raise ModelAdapterResponseError("cloud model response is missing assistant text") from exc
+        if not isinstance(text, str):
+            raise ModelAdapterResponseError("cloud model response is missing assistant text")
+        return ModelResponse(text=text, model=self.model_id)
+
+
 def context_from_lookup(items: Sequence[object]) -> tuple[ModelContextItem, ...]:
     """Convert public LookupResultItem-like values to the thin adapter context."""
     result: list[ModelContextItem] = []
@@ -132,6 +195,7 @@ def context_from_lookup(items: Sequence[object]) -> tuple[ModelContextItem, ...]
 
 __all__ = [
     "ModelAdapter",
+    "ModelAdapterConfigurationError",
     "ModelAdapterConnectionError",
     "ModelAdapterError",
     "ModelAdapterResponseError",
@@ -139,6 +203,7 @@ __all__ = [
     "ModelRequest",
     "ModelResponse",
     "OllamaAdapter",
+    "OpenAICompatibleAdapter",
     "build_prompt",
     "context_from_lookup",
     "render_context",
