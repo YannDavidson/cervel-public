@@ -87,6 +87,9 @@ jobs:
       - name: Run local developer sandbox tests
         run: python sdk/python/tests/test_sandbox.py
 
+      - name: Run loopback LocalClient tests
+        run: python sdk/python/tests/test_client.py
+
       - name: Verify frozen alpha release metadata
         run: python release/verify_candidate.py metadata
 
