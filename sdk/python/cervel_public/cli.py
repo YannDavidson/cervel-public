@@ -12,7 +12,7 @@ from .model_adapters import (
     OpenAICompatibleAdapter,
     context_from_lookup,
 )
-from .sandbox import DEFAULT_PORT, ValidationDependencyError, run_dev_server
+from .sandbox import DEFAULT_DB_PATH, DEFAULT_PORT, ValidationDependencyError, run_dev_server
 
 
 def _model_selector(value: str) -> tuple[str, str]:
@@ -27,6 +27,11 @@ def build_parser() -> argparse.ArgumentParser:
     subcommands = parser.add_subparsers(dest="command", required=True)
     dev = subcommands.add_parser("dev", help="run the local public developer sandbox")
     dev.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"loopback port (default: {DEFAULT_PORT})")
+    dev.add_argument(
+        "--db",
+        default=str(DEFAULT_DB_PATH),
+        help=f"local SQLite sandbox database (default: {DEFAULT_DB_PATH})",
+    )
 
     ask = subcommands.add_parser("ask", help="ask a developer-selected model using public sandbox lookup context")
     ask.add_argument("question")
@@ -56,7 +61,7 @@ def main(argv: list[str] | None = None) -> int:
         if not 1 <= args.port <= 65535:
             raise SystemExit("--port must be between 1 and 65535")
         try:
-            run_dev_server(port=args.port)
+            run_dev_server(port=args.port, db_path=args.db)
         except ValidationDependencyError:
             print("cervel dev requires local sandbox validation support.")
             print("Install with: python -m pip install 'cervel-public[sandbox]'")
