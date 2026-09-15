@@ -15,10 +15,10 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "release" / "alpha-0.1.0-a2.json"
+MANIFEST = ROOT / "release" / "alpha-0.1.0-a3.json"
 PYPROJECT = ROOT / "sdk" / "python" / "pyproject.toml"
 CHANGELOG = ROOT / "CHANGELOG.md"
-RELEASE_NOTES = ROOT / "docs" / "releases" / "0.1.0-alpha.2.md"
+RELEASE_NOTES = ROOT / "docs" / "releases" / "0.1.0-alpha.3.md"
 RELEASING = ROOT / "RELEASING.md"
 
 

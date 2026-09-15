@@ -8,16 +8,18 @@ The repository is pre-stable. Until a stable release is declared, public contrac
 
 ### Added
 
-- CERVEL Local Developer Sandbox with a `cervel dev` CLI.
-- Loopback-only `GET /capabilities`, `POST /capture`, and `POST /lookup` endpoints.
-- Ephemeral in-memory capture records and deterministic public token-overlap lookup behavior.
-- Contract validation for sandbox requests and generated public responses.
-- HTTP integration tests, installed-wheel CLI checks, and local sandbox documentation.
-- Optional `sandbox` dependency extra.
+- Dependency-free Python `LocalClient` for the bounded localhost developer sandbox.
+- `capabilities()`, `capture()`, and `lookup()` client methods returning existing public typed models.
+- Loopback-only target enforcement and stable client failure types.
+- Client success/failure tests, installed-wheel coverage, distribution checks, executable example, and API documentation.
 
 ### Changed
 
-- Prepared the next Python prerelease candidate as `0.1.0a2` / `0.1.0-alpha.2` without modifying the published `0.1.0a1` release.
+- Prepared the next Python prerelease candidate as `0.1.0a3` / `0.1.0-alpha.3` without modifying the published `0.1.0a2` release.
+
+## 0.1.0-alpha.2
+
+Published as Python package version `0.1.0a2` with tag `v0.1.0-alpha.2`. Added the CERVEL Local Developer Sandbox, `cervel dev`, loopback-only public capture/lookup/capability routes, ephemeral in-memory records, deterministic development-only lookup behavior, sandbox validation, and installed-wheel runtime verification.
 
 ## 0.1.0-alpha.1
 
