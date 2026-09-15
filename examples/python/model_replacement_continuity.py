@@ -13,14 +13,6 @@ from __future__ import annotations
 
 import argparse
 
-from cervel_public import (
-    LocalClient,
-    ModelRequest,
-    OllamaAdapter,
-    OpenAICompatibleAdapter,
-    context_from_lookup,
-)
-
 QUESTION = "What do we know about Project Atlas?"
 KNOWLEDGE = (
     "Project Atlas uses CERVEL so its knowledge can remain stable while the "
@@ -51,6 +43,24 @@ def main() -> int:
         return 0
     if args.cloud_model and not args.send_context_to_cloud:
         parser.error("--cloud-model requires --send-context-to-cloud")
+
+    # These APIs are repository development surfaces for the next prerelease.
+    # Import them only for an explicitly requested live run so the repository's
+    # published-package smoke test can continue exercising the currently pinned
+    # public release without contacting a sandbox or model provider.
+    try:
+        from cervel_public import (
+            LocalClient,
+            ModelRequest,
+            OllamaAdapter,
+            OpenAICompatibleAdapter,
+            context_from_lookup,
+        )
+    except ImportError as exc:
+        raise RuntimeError(
+            "the live continuity demo requires the repository development SDK; "
+            "install this checkout before using --run"
+        ) from exc
 
     client = LocalClient()
     reference = client.capture(KNOWLEDGE, source="continuity-demo", title="Project Atlas")
