@@ -5,8 +5,9 @@ knowledge once, snapshots the public lookup result, asks a local Ollama model,
 optionally asks a developer-owned OpenAI-compatible cloud model, and verifies
 that the public knowledge snapshot is unchanged after the model switch.
 
-The sandbox is currently in-memory. This proves continuity while the same
-sandbox process remains running; it does not claim persistence across restarts.
+This example deliberately isolates model switching within one running process.
+The public sandbox now has separate bounded SQLite restart persistence, verified
+by tests that stop one server and create a new server against the same database.
 """
 
 from __future__ import annotations
@@ -96,7 +97,7 @@ def main() -> int:
         raise RuntimeError("knowledge snapshot changed while switching reasoning models")
 
     print("\nPASS: public knowledge snapshot is unchanged.")
-    print("Knowledge stayed in the same running sandbox; only the reasoning model changed.")
+    print("Knowledge stayed in the sandbox; only the reasoning model changed.")
     return 0
 
 

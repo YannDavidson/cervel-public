@@ -30,10 +30,10 @@ class ContinuityDemoTests(unittest.TestCase):
             before,
         )
 
-    def test_demo_source_states_same_process_boundary(self) -> None:
+    def test_demo_source_states_model_and_restart_boundaries(self) -> None:
         source = DEMO.read_text(encoding="utf-8")
-        self.assertIn("same sandbox process remains running", source)
-        self.assertIn("does not claim persistence across restarts", source)
+        self.assertIn("isolates model switching within one running process", source)
+        self.assertIn("bounded SQLite restart persistence", source)
         self.assertIn("--send-context-to-cloud", source)
 
 

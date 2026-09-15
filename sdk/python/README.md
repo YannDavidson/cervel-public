@@ -22,7 +22,7 @@ Start the bounded local sandbox:
 cervel dev
 ```
 
-The sandbox binds only to `127.0.0.1` and uses port `8765` by default.
+The sandbox binds only to `127.0.0.1`, uses port `8765` by default, and stores public development records in `~/.cervel-public/sandbox.sqlite3`. Use `cervel dev --db PATH` to select another local database.
 
 In another terminal, inspect the published capabilities:
 
@@ -30,7 +30,7 @@ In another terminal, inspect the published capabilities:
 curl http://127.0.0.1:8765/capabilities
 ```
 
-Capture a local in-memory record:
+Capture a local sandbox record:
 
 ```bash
 curl -X POST http://127.0.0.1:8765/capture \
@@ -60,7 +60,7 @@ The sandbox exposes only:
 - `POST /capture`
 - `POST /lookup`
 
-Records live only in process memory and disappear when the sandbox stops. Identifiers are synthetic and local. Lookup is deliberately simple and deterministic; it is not CERVEL's production retrieval or ranking behavior.
+Records survive sandbox process restarts when the same local SQLite database is reused, and their synthetic `local-*` references remain stable. Lookup is deliberately simple and deterministic; it is not CERVEL's production retrieval or ranking behavior. The SQLite store is a public developer mechanism, not the proprietary CERVEL Vault or production persistence architecture.
 
 ## Installation modes
 
@@ -137,7 +137,7 @@ The resulting payload is validated against the published Lookup Result schema, i
 
 The local sandbox is a compatibility and developer surface. It is **not** the proprietary CERVEL engine and does not establish compatibility with a production CERVEL implementation.
 
-The public package does not expose or implement CERVEL's non-public authorization or permission-aware activation behavior, persistence mechanisms, provenance processing, Knowledge Compiler, context compilation, production retrieval or ranking, Intelligence Gateway, model routing, agent orchestration, private Vault internals, production identifiers, private storage, service topology, or other unpublished runtime mechanisms.
+The public package does not expose or implement CERVEL's non-public authorization or permission-aware activation behavior, production persistence mechanisms, provenance processing, Knowledge Compiler, context compilation, production retrieval or ranking, Intelligence Gateway, model routing, agent orchestration, private Vault internals, production identifiers, private storage semantics, service topology, or other unpublished runtime mechanisms. Its SQLite persistence is intentionally limited to public sandbox records.
 
 The public sandbox may accept `scope` as public request data where the published schema permits it, but it does not interpret or enforce `scope` as production authorization or permission semantics.
 

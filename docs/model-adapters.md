@@ -12,6 +12,8 @@ Run the sandbox and capture records once using `LocalClient`:
 cervel dev
 ```
 
+By default, `cervel dev` stores its public sandbox records in `~/.cervel-public/sandbox.sqlite3`. Stop the process and start `cervel dev` again: the same local records and `local-*` references remain available. Developers may select another local database with `--db PATH`.
+
 Ask the same local knowledge with Ollama:
 
 ```bash
@@ -29,11 +31,24 @@ The cloud path is deliberately explicit. CERVEL does not store, broker, or manag
 
 For another reviewed OpenAI-compatible HTTPS endpoint, the developer may set `--openai-base-url` and optionally `--openai-api-key-env`. Credentials in URLs, plaintext configuration files, and non-HTTPS cloud endpoints are rejected by this public adapter.
 
-This is runtime selection, not a persisted default. The selected model belongs to the invocation; the public knowledge remains in the same sandbox. The current sandbox is in-memory and therefore does not claim durable persistence across sandbox restarts.
+This is runtime model selection, not a persisted model default. The selected reasoning model belongs to the invocation; the public sandbox knowledge is stored separately.
+
+## Restart continuity
+
+The public developer sandbox now includes deliberately bounded local persistence. The restart proof is:
+
+1. start `cervel dev` and capture a record;
+2. record its returned `local-*` reference;
+3. stop the sandbox process completely;
+4. start `cervel dev` again against the same database;
+5. look up the record and verify the same reference and content are returned;
+6. ask with Ollama or explicitly switch to a configured cloud model without recapturing the knowledge.
+
+The repository test suite performs this with two distinct server instances against one temporary SQLite database. This is local developer persistence only. It is not the proprietary CERVEL Vault, CKO storage model, production persistence topology, synchronization layer, or provenance system.
 
 ## Continuity proof demo
 
-The repository includes `examples/python/model_replacement_continuity.py` as a deliberately observable proof. Keep one `cervel dev` process running, then in another terminal run:
+The repository includes `examples/python/model_replacement_continuity.py` as an observable model-switch proof. Run it against `cervel dev` with:
 
 ```bash
 python examples/python/model_replacement_continuity.py --run --ollama-model llama3
@@ -52,14 +67,12 @@ python examples/python/model_replacement_continuity.py \
   --send-context-to-cloud
 ```
 
-The expected proof is explicit: one capture, two developer-selected reasoning models, and equal public knowledge snapshots before and after the switch. The model outputs may differ; the knowledge snapshot must not. No recapture or migration occurs between model calls.
-
-Because the public sandbox is currently in-memory, this proof is scoped to the same running sandbox process. Restarting the sandbox clears its records; durable continuity across restarts belongs to a separate reviewed persistence rollout.
+The model outputs may differ; the public knowledge snapshot must not. No recapture or migration occurs between model calls. Restart continuity is independently enforced by the sandbox persistence tests described above.
 
 ## Architectural boundary
 
-This interface demonstrates one claim: knowledge can remain stable while the reasoning engine is replaceable.
+This public surface demonstrates two bounded claims: reasoning models can be replaced without moving the public sandbox knowledge, and the local sandbox knowledge can survive a developer sandbox restart.
 
-It is **not** the CERVEL Intelligence Gateway. It does not expose or reproduce production routing, permission-aware activation/MSAKS, proprietary context compilation/CCP behavior, CKO or CKURI internals, production retrieval/ranking, durable Vault persistence, agent orchestration, provenance machinery, authentication, hidden endpoints, or CERVEL-managed provider credentials.
+It is **not** the CERVEL Intelligence Gateway or Vault. It does not expose or reproduce production routing, permission-aware activation/MSAKS, proprietary context compilation/CCP behavior, CKO or CKURI internals, production retrieval/ranking, production Vault persistence, synchronization, agent orchestration, provenance machinery, authentication, hidden endpoints, or CERVEL-managed provider credentials.
 
 `ModelAdapter` remains provider-neutral. The public implementations translate already-returned public lookup context into developer-selected model requests. They do not decide what knowledge should activate, compile a proprietary context package, or route among models automatically.
