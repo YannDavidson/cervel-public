@@ -31,6 +31,31 @@ For another reviewed OpenAI-compatible HTTPS endpoint, the developer may set `--
 
 This is runtime selection, not a persisted default. The selected model belongs to the invocation; the public knowledge remains in the same sandbox. The current sandbox is in-memory and therefore does not claim durable persistence across sandbox restarts.
 
+## Continuity proof demo
+
+The repository includes `examples/python/model_replacement_continuity.py` as a deliberately observable proof. Keep one `cervel dev` process running, then in another terminal run:
+
+```bash
+python examples/python/model_replacement_continuity.py --run --ollama-model llama3
+```
+
+That captures one synthetic Project Atlas record, snapshots the public lookup result, asks Ollama, performs the lookup again, and fails if the knowledge snapshot changed.
+
+To demonstrate a local-to-cloud model switch against the same captured knowledge:
+
+```bash
+export OPENAI_API_KEY="..."
+python examples/python/model_replacement_continuity.py \
+  --run \
+  --ollama-model llama3 \
+  --cloud-model YOUR_MODEL \
+  --send-context-to-cloud
+```
+
+The expected proof is explicit: one capture, two developer-selected reasoning models, and equal public knowledge snapshots before and after the switch. The model outputs may differ; the knowledge snapshot must not. No recapture or migration occurs between model calls.
+
+Because the public sandbox is currently in-memory, this proof is scoped to the same running sandbox process. Restarting the sandbox clears its records; durable continuity across restarts belongs to a separate reviewed persistence rollout.
+
 ## Architectural boundary
 
 This interface demonstrates one claim: knowledge can remain stable while the reasoning engine is replaceable.
