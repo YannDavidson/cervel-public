@@ -5,15 +5,21 @@ from __future__ import annotations
 import argparse
 
 from .client import LocalClient, LocalClientError
-from .model_adapters import ModelAdapterError, ModelRequest, OllamaAdapter, context_from_lookup
+from .model_adapters import (
+    ModelAdapterError,
+    ModelRequest,
+    OllamaAdapter,
+    OpenAICompatibleAdapter,
+    context_from_lookup,
+)
 from .sandbox import DEFAULT_PORT, ValidationDependencyError, run_dev_server
 
 
-def _ollama_model(value: str) -> str:
-    prefix = "ollama:"
-    if not value.startswith(prefix) or not value[len(prefix):].strip():
-        raise argparse.ArgumentTypeError("public alpha supports model selectors like ollama:llama3")
-    return value[len(prefix):].strip()
+def _model_selector(value: str) -> tuple[str, str]:
+    provider, separator, model = value.partition(":")
+    if separator != ":" or provider not in {"ollama", "openai"} or not model.strip():
+        raise argparse.ArgumentTypeError("model must be ollama:MODEL or openai:MODEL")
+    return provider, model.strip()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -24,8 +30,23 @@ def build_parser() -> argparse.ArgumentParser:
 
     ask = subcommands.add_parser("ask", help="ask a developer-selected model using public sandbox lookup context")
     ask.add_argument("question")
-    ask.add_argument("--model", required=True, type=_ollama_model, metavar="ollama:MODEL")
+    ask.add_argument("--model", required=True, type=_model_selector, metavar="PROVIDER:MODEL")
     ask.add_argument("--limit", type=int, default=5)
+    ask.add_argument(
+        "--send-context-to-cloud",
+        action="store_true",
+        help="explicitly allow public sandbox lookup context to be sent to a configured cloud provider",
+    )
+    ask.add_argument(
+        "--openai-base-url",
+        default="https://api.openai.com/v1",
+        help="HTTPS OpenAI-compatible API base URL (default: OpenAI)",
+    )
+    ask.add_argument(
+        "--openai-api-key-env",
+        default="OPENAI_API_KEY",
+        help="environment variable containing the developer-owned API key",
+    )
     return parser
 
 
@@ -47,9 +68,17 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "ask":
         if args.limit < 1:
             raise SystemExit("--limit must be at least 1")
-        client = LocalClient()
-        adapter = OllamaAdapter(args.model)
+        provider, model = args.model
+        if provider == "openai" and not args.send_context_to_cloud:
+            print("cervel ask refused to send sandbox context to a cloud provider without --send-context-to-cloud")
+            return 2
         try:
+            adapter = (
+                OllamaAdapter(model)
+                if provider == "ollama"
+                else OpenAICompatibleAdapter(model, base_url=args.openai_base_url, api_key_env=args.openai_api_key_env)
+            )
+            client = LocalClient()
             lookup = client.lookup(args.question, limit=args.limit)
             result = adapter.generate(ModelRequest(question=args.question, context=context_from_lookup(lookup.items)))
         except (LocalClientError, ModelAdapterError) as exc:
