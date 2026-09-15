@@ -24,6 +24,7 @@ on:
       - ".github/workflows/dco.yml"
       - ".github/workflows/publish-pypi.yml"
       - ".github/workflows/pypi-install-smoke.yml"
+      - ".github/workflows/release-alpha3.yml"
   push:
     branches:
       - main
@@ -49,6 +50,7 @@ on:
       - ".github/workflows/dco.yml"
       - ".github/workflows/publish-pypi.yml"
       - ".github/workflows/pypi-install-smoke.yml"
+      - ".github/workflows/release-alpha3.yml"
 
 permissions:
   contents: read
@@ -132,7 +134,7 @@ jobs:
       - name: Install and exercise built sandbox wheel in a fresh environment
         run: |
           python -m venv /tmp/cervel-sandbox-venv
-          /tmp/cervel-sandbox-venv/bin/python -m pip install --disable-pip-version-check --no-deps sdk/python/dist/*.whl
+          /tmp/cervel-sandbox-venv/bin/python -m pip install --disable-pip-version-check --no-index --no-deps sdk/python/dist/*.whl
           /tmp/cervel-sandbox-venv/bin/python -m pip install --disable-pip-version-check jsonschema==4.25.1
           cd /tmp
           /tmp/cervel-sandbox-venv/bin/python "$GITHUB_WORKSPACE/sdk/python/tests/smoke_sandbox_installed.py"
