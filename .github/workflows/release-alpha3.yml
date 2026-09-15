@@ -1,0 +1,115 @@
+name: Create alpha.3 GitHub prerelease
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release-alpha3.yml
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Create verified alpha.3 GitHub prerelease
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Check out exact release candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: 6782b607f34eb2587926d2deefc67800cbaf729a
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: sdk/python/requirements-build.txt
+
+      - name: Verify exact release commit and candidate identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "6782b607f34eb2587926d2deefc67800cbaf729a"
+          python - <<'PY'
+          import json, pathlib, tomllib
+          root = pathlib.Path('.')
+          manifest = json.loads((root / 'release/alpha-0.1.0-a3.json').read_text())
+          with (root / 'sdk/python/pyproject.toml').open('rb') as handle:
+              project = tomllib.load(handle)['project']
+          assert manifest['release_label'] == '0.1.0-alpha.3'
+          assert manifest['python_version'] == '0.1.0a3'
+          assert manifest['tag'] == 'v0.1.0-alpha.3'
+          assert project['version'] == '0.1.0a3'
+          PY
+
+      - name: Install pinned build tooling
+        run: python -m pip install --disable-pip-version-check -r sdk/python/requirements-build.txt
+
+      - name: Build and canonicalize release artifacts twice
+        shell: bash
+        env:
+          SOURCE_DATE_EPOCH: '315532800'
+          PYTHONHASHSEED: '0'
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/cervel-build-a /tmp/cervel-build-b /tmp/cervel-release sdk/python/build sdk/python/cervel_public.egg-info
+          python -m build --no-isolation --sdist --wheel --outdir /tmp/cervel-build-a sdk/python
+          rm -rf sdk/python/build sdk/python/cervel_public.egg-info
+          python -m build --no-isolation --sdist --wheel --outdir /tmp/cervel-build-b sdk/python
+          python release/verify_candidate.py normalize-sdist /tmp/cervel-build-a --epoch 315532800
+          python release/verify_candidate.py normalize-sdist /tmp/cervel-build-b --epoch 315532800
+          python release/verify_candidate.py compare /tmp/cervel-build-a /tmp/cervel-build-b
+          python release/verify_candidate.py stage /tmp/cervel-build-a /tmp/cervel-release
+
+      - name: Verify frozen hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/EXPECTED_SHA256SUMS <<'EOF'
+          ea2f28fd9ef3ab581f910429adef394681e207ab316cca15ca6c1921e13fed4f  cervel_public-0.1.0a3-py3-none-any.whl
+          2485ac985ff7755e355a8f89ca7a403c72ac05d35d8846b902c5712eb96a9da9  cervel_public-0.1.0a3.tar.gz
+          EOF
+          cmp /tmp/EXPECTED_SHA256SUMS /tmp/cervel-release/SHA256SUMS
+          cd /tmp/cervel-release
+          sha256sum -c SHA256SUMS
+
+      - name: Create immutable tag and GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test -z "$(git ls-remote --tags origin refs/tags/v0.1.0-alpha.3)"
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+            -f ref='refs/tags/v0.1.0-alpha.3' \
+            -f sha='6782b607f34eb2587926d2deefc67800cbaf729a'
+          gh release create v0.1.0-alpha.3 \
+            /tmp/cervel-release/cervel_public-0.1.0a3-py3-none-any.whl \
+            /tmp/cervel-release/cervel_public-0.1.0a3.tar.gz \
+            /tmp/cervel-release/SHA256SUMS \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title 'CERVEL Public 0.1.0-alpha.3' \
+            --notes-file docs/releases/0.1.0-alpha.3.md \
+            --prerelease \
+            --verify-tag
+
+      - name: Verify published release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/release-verify
+          mkdir -p /tmp/release-verify
+          gh release download v0.1.0-alpha.3 --repo "${GITHUB_REPOSITORY}" --dir /tmp/release-verify
+          test "$(find /tmp/release-verify -maxdepth 1 -type f | wc -l | tr -d ' ')" = "3"
+          cmp /tmp/cervel-release/SHA256SUMS /tmp/release-verify/SHA256SUMS
+          cd /tmp/release-verify
+          sha256sum -c SHA256SUMS
