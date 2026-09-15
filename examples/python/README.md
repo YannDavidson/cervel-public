@@ -2,7 +2,7 @@
 
 These examples use only the experimental public `cervel_public` SDK and synthetic data.
 
-Run them after installing the local SDK as described in `docs/python-quickstart.md`:
+Run the contract examples after installing the local SDK as described in `docs/python-quickstart.md`:
 
 ```bash
 python examples/python/01_capture.py
@@ -11,6 +11,14 @@ python examples/python/03_synthetic_lookup_result.py
 python examples/python/04_quickstart_flow.py
 ```
 
-They demonstrate local construction and handling of published public contract objects only. They do not call a CERVEL endpoint, perform capture or retrieval, persist knowledge, apply authorization, rank results, or expose private runtime behavior.
+Those examples demonstrate local construction and handling of published public contract objects only.
 
-CI discovers and executes every `*.py` file in this directory against the built and installed wheel.
+The opt-in model-replacement continuity example is different: it talks only to a developer's running loopback sandbox and developer-selected model adapters. Start `cervel dev`, then run:
+
+```bash
+python examples/python/model_replacement_continuity.py --run --ollama-model llama3
+```
+
+Add `--cloud-model YOUR_MODEL --send-context-to-cloud` (and a developer-owned API key in the configured environment variable) to prove a local-to-cloud reasoning-model switch against the same in-memory sandbox knowledge. The example compares public lookup snapshots before and after the switch and fails if they differ. It does not claim persistence across sandbox restarts or expose private runtime behavior.
+
+CI discovers and executes every `*.py` file in this directory against the built and installed wheel. The live continuity example therefore requires explicit `--run`; without it, CI verifies that the example imports and exits safely without contacting a sandbox or model provider.
