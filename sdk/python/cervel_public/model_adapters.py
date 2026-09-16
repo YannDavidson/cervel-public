@@ -86,15 +86,44 @@ def build_prompt(value: ModelRequest) -> str:
     )
 
 
+def _validate_timeout(timeout: float) -> float:
+    if timeout <= 0:
+        raise ModelAdapterConfigurationError("timeout must be greater than zero")
+    return timeout
+
+
+def _validate_ollama_base_url(base_url: str) -> str:
+    parsed = urlparse(base_url)
+    if (
+        parsed.scheme != "http"
+        or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
+        or parsed.username
+        or parsed.password
+        or parsed.query
+        or parsed.fragment
+        or parsed.path not in {"", "/"}
+    ):
+        raise ModelAdapterConfigurationError(
+            "Ollama base_url must be an HTTP loopback origin without credentials, path, query, or fragment"
+        )
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise ModelAdapterConfigurationError("Ollama base_url contains an invalid port") from exc
+    if port is not None and not 1 <= port <= 65535:
+        raise ModelAdapterConfigurationError("Ollama base_url port must be between 1 and 65535")
+    return base_url.rstrip("/")
+
+
 class OllamaAdapter:
-    """Small localhost Ollama adapter; no API key or cloud dependency."""
+    """Small loopback-only Ollama adapter; no API key or cloud dependency."""
 
     def __init__(self, model: str, *, base_url: str = "http://127.0.0.1:11434", timeout: float = 60.0) -> None:
         if not model.strip():
-            raise ValueError("model must not be empty")
+            raise ModelAdapterConfigurationError("model must not be empty")
         self._model = model.strip()
-        self._base_url = base_url.rstrip("/")
-        self._timeout = timeout
+        self._base_url = _validate_ollama_base_url(base_url)
+        self._timeout = _validate_timeout(timeout)
 
     @property
     def model_id(self) -> str:
@@ -111,6 +140,8 @@ class OllamaAdapter:
         try:
             with request.urlopen(req, timeout=self._timeout) as response:
                 decoded = json.loads(response.read().decode("utf-8"))
+        except error.HTTPError as exc:
+            raise ModelAdapterResponseError(f"Ollama returned HTTP {exc.code}") from exc
         except (error.URLError, OSError) as exc:
             raise ModelAdapterConnectionError(f"could not reach Ollama at {self._base_url}") from exc
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -144,7 +175,7 @@ class OpenAICompatibleAdapter:
         self._model = model.strip()
         self._api_key = key.strip()
         self._base_url = base_url.rstrip("/")
-        self._timeout = timeout
+        self._timeout = _validate_timeout(timeout)
 
     @property
     def model_id(self) -> str:
