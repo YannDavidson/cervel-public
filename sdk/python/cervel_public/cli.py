@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 
 from .client import LocalClient, LocalClientError
+from .continuity_demo import run_continuity_demo
 from .model_adapters import (
     ModelAdapterError,
     ModelRequest,
@@ -52,6 +53,22 @@ def build_parser() -> argparse.ArgumentParser:
         default="OPENAI_API_KEY",
         help="environment variable containing the developer-owned API key",
     )
+
+    demo = subcommands.add_parser("demo", help="run an observable public developer proof")
+    demos = demo.add_subparsers(dest="demo_command", required=True)
+    continuity = demos.add_parser(
+        "continuity",
+        help="capture once, restart the sandbox, recover the same knowledge, and reason with a replaceable model",
+    )
+    continuity.add_argument("--ollama-model", default="llama3")
+    continuity.add_argument("--cloud-model")
+    continuity.add_argument("--cloud-base-url", default="https://api.openai.com/v1")
+    continuity.add_argument("--cloud-api-key-env", default="OPENAI_API_KEY")
+    continuity.add_argument(
+        "--send-context-to-cloud",
+        action="store_true",
+        help="explicitly allow demo sandbox context to be sent to a configured cloud provider",
+    )
     return parser
 
 
@@ -92,6 +109,22 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Using: {result.model}")
         print(result.text)
         return 0
+
+    if args.command == "demo" and args.demo_command == "continuity":
+        if args.cloud_model and not args.send_context_to_cloud:
+            print("cervel demo continuity refused cloud context without --send-context-to-cloud")
+            return 2
+        try:
+            return run_continuity_demo(
+                ollama_model=args.ollama_model,
+                cloud_model=args.cloud_model,
+                cloud_base_url=args.cloud_base_url,
+                cloud_api_key_env=args.cloud_api_key_env,
+                send_context_to_cloud=args.send_context_to_cloud,
+            )
+        except (LocalClientError, ModelAdapterError, ValidationDependencyError, RuntimeError, ValueError) as exc:
+            print(f"cervel demo continuity failed: {exc}")
+            return 2
     return 2
 
 
