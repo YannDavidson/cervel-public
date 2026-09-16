@@ -8,23 +8,41 @@ This repository is the deliberately reviewed public home for CERVEL developer-fa
 
 CERVEL is built around a simple idea: durable knowledge should remain useful even as models, applications, and interfaces change.
 
-## Install it. Run it. Build against it.
+## Install it. Run it. Restart it. Switch models.
 
-The current published public alpha includes a bounded localhost developer sandbox. Install it from PyPI:
+The latest published Python SDK release is `cervel-public==0.1.0a3`. The current `main` branch moves beyond that published prerelease with developer-owned model adapters, observable model-replacement continuity, and bounded SQLite-backed local sandbox persistence.
+
+To use the latest published package from PyPI:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install 'cervel-public[sandbox]==0.1.0a2'
+python -m pip install 'cervel-public[sandbox]==0.1.0a3'
 ```
 
-Start the sandbox:
+To exercise the newest capabilities currently on `main`, including restart persistence and the latest model-switching work, install from a repository clone:
+
+```bash
+git clone https://github.com/YannDavidson/cervel-public.git
+cd cervel-public
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e './sdk/python[sandbox]'
+```
+
+Start the bounded local sandbox:
 
 ```bash
 cervel dev
 ```
 
-It binds only to `127.0.0.1` and defaults to port `8765`.
+It binds only to `127.0.0.1`, defaults to port `8765`, and on current `main` stores public sandbox records in:
+
+```text
+~/.cervel-public/sandbox.sqlite3
+```
+
+Use `cervel dev --db PATH` to select another local SQLite database.
 
 Check the public capabilities:
 
@@ -64,18 +82,62 @@ POST /capture
 POST /lookup
 ```
 
-Records exist only in process memory and disappear when the sandbox stops. Identifiers are synthetic local identifiers. Lookup behavior is deliberately simple and deterministic for developer compatibility testing; it is not CERVEL's production retrieval or ranking behavior.
+On current `main`, records survive a complete sandbox process restart when the same local SQLite database is reused. Their synthetic `local-*` references remain stable, and new captures continue the durable local sequence. Lookup remains deliberately simple and deterministic for developer compatibility testing; it is not CERVEL's production retrieval or ranking behavior.
 
 See `docs/local-developer-sandbox.md` for the complete sandbox guide.
+
+## Replace the reasoning model, not the knowledge
+
+Current `main` includes a public model-adapter surface for developer-selected reasoning models. A developer can keep knowledge in the local sandbox, ask with Ollama, and explicitly switch to a configured OpenAI-compatible cloud model without recapturing or migrating that knowledge.
+
+Ask using a local Ollama model:
+
+```bash
+cervel ask "What do we know about Project Atlas?" --model ollama:llama3
+```
+
+Cloud model use is deliberately explicit. The developer supplies the provider credential at execution time and must explicitly consent to sending retrieved context to the cloud. CERVEL does not persist provider API keys.
+
+The repository also includes an opt-in continuity demonstration:
+
+```bash
+python examples/python/model_replacement_continuity.py --run --ollama-model llama3
+```
+
+See `docs/model-adapters.md` for the model-adapter and continuity guide.
+
+## Restart continuity
+
+Current `main` includes bounded local SQLite persistence for the public sandbox. The observable developer flow is:
+
+```text
+capture knowledge
+      ↓
+stop cervel dev
+      ↓
+restart cervel dev
+      ↓
+retrieve the same local reference and content
+      ↓
+ask with Ollama
+      ↓
+switch reasoning model
+      ↓
+knowledge remains in the sandbox
+```
+
+The automated tests exercise restart continuity using two distinct server instances against the same temporary SQLite database and verify that the same public reference and content survive without recapture.
+
+This is deliberately a **public developer persistence mechanism**, not the proprietary CERVEL Vault or production persistence architecture.
 
 ## Choose your developer mode
 
 ### Base SDK
 
-Typed convenience models for the public experimental contracts, with no runtime dependencies:
+Typed convenience models for the published public experimental contracts, with no runtime dependencies:
 
 ```bash
-python -m pip install cervel-public==0.1.0a2
+python -m pip install cervel-public==0.1.0a3
 ```
 
 ### Local contract validation
@@ -83,7 +145,7 @@ python -m pip install cervel-public==0.1.0a2
 Add local JSON Schema validation helpers:
 
 ```bash
-python -m pip install 'cervel-public[validation]==0.1.0a2'
+python -m pip install 'cervel-public[validation]==0.1.0a3'
 ```
 
 Example:
@@ -102,18 +164,20 @@ print(capture.to_dict())
 
 ### Local developer sandbox
 
-Install the runnable localhost compatibility target:
+For the published Alpha.3 sandbox:
 
 ```bash
-python -m pip install 'cervel-public[sandbox]==0.1.0a2'
+python -m pip install 'cervel-public[sandbox]==0.1.0a3'
 cervel dev
 ```
+
+For the newest sandbox behavior on `main`, including durable local restart persistence, install from the repository clone as shown above.
 
 ## Deliberate public/private boundary
 
 The local developer sandbox is a compatibility and development surface. It is **not** the proprietary CERVEL engine and does not establish compatibility with a production CERVEL deployment.
 
-The public package deliberately does not expose or implement CERVEL's non-public authorization or permission-aware activation, persistence systems, provenance processing, Knowledge Compiler, context compilation, production retrieval or ranking, Intelligence Gateway, model routing, agent orchestration, private Vault internals, production identifiers, private storage, or service topology.
+Current `main` implements bounded SQLite persistence only for public sandbox records. The public package does not expose or reproduce CERVEL's non-public authorization or permission-aware activation/MSAKS, production Vault persistence, CKO/CKURI internals, provenance processing, Knowledge Compiler, CCP/context compilation, production retrieval or ranking, Intelligence Gateway, production model routing, agent orchestration, synchronization, authentication, production identifiers, private storage semantics, or service topology.
 
 Public sandbox `scope` values are accepted only as public request data and are not interpreted as production authorization or permission semantics.
 
@@ -123,7 +187,8 @@ Only contracts and behavior explicitly published in this repository should be tr
 
 - `docs/python-quickstart.md` — five-minute Python quickstart.
 - `docs/python-sdk-api-reference.md` — complete public Python API reference.
-- `docs/local-developer-sandbox.md` — install, run, and build against the bounded localhost sandbox.
+- `docs/local-developer-sandbox.md` — install, run, restart, and build against the bounded localhost sandbox.
+- `docs/model-adapters.md` — developer-selected model adapters and continuity demonstrations.
 - `docs/CONCEPTS.md` — public vocabulary for persistent knowledge and traceability.
 - `docs/ARCHITECTURE.md` — deliberately high-level public architecture.
 - `docs/TRUST_PRINCIPLES.md` — security and trust expectations for public interfaces.
@@ -138,7 +203,7 @@ Only contracts and behavior explicitly published in this repository should be tr
 
 CERVEL is in active development. Public material may evolve before stable releases.
 
-The current published Python SDK release is `cervel-public==0.1.0a2`. Alpha.2 includes the bounded local developer sandbox described above.
+The latest published Python SDK release is `cervel-public==0.1.0a3`. Current `main` contains additional reviewed developer capabilities that have not yet been represented as a newer PyPI prerelease, including model switching and bounded local restart persistence.
 
 This repository is **not** a mirror of non-public CERVEL source or infrastructure. Only material explicitly published here should be treated as part of the public CERVEL surface.
 
